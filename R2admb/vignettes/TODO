@@ -1,0 +1,47 @@
+* make robust to multiple ADMB runs in the same directory: locking?
+* add example to help file!
+* attach data as well when checking bounds in DATA section
+* don't try to check data/params at all when check is set to "ignore"
+* fix integer trap! (somehow)
+* document write_files; modularize further (allow turning off compile, etc.)
+* weaken/eliminate ggplot2 dependency
+* comparisons with PBSadmb?
+* implement "fixed" argument (set phase <0)
+* support for transformations (on the fly)?
+* add MCMC quantiles etc. to summary: coeftab?
+* confint method?
+-   "quad" if only se/vcov known
+-   "profile" if known
+-   MCMC: quantile/HPDinterval if known
+* better setup detection, error trapping:
+   comments on adcomp/adlink/admb scripts
+* more checking of dat/pin files:
+* allow for more sections in TPL file to passed through "as is"
+* test/document examples of random effects in vignette:
+* ?? formula interface???
+* read bar (binary) rather than par file?
+* read hessian file?
+* evaluate objective function by fixing vals
+* restructure into three chunks: 
+    (1) check and construct TPL/data files; (2) run ADMB;
+    (3) pull results into R (and clean up?) -- 
+       generate shell script for run?  generate
+       versioned TPL file?  
+     (all to simplify use e.g. by people who will upload to a cluster)
+
+=======
+
+* add phase support
+
+* finish bounds support: check bounds on initial parameters?
+
+* better strategy for saving originals when changing case/auto-generating
+inputs -- temporary filenames, or temp directory??
+
+* TEST check for variables with "." in the name: stop? change to "_" and warn?      
+* check for random effects vectors (don't redefine if already there)
+* parameter/data order checking? (done, I think)
+* more checks/flags of compiling step -- stop if error
+* more info on thinning etc. of MCMC saved/printed in final object
+* allow just compilation, just run from previous compilation ...
+* double-check parnames in read_pars(), compare with Nielsen version

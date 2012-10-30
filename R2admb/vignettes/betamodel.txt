@@ -1,0 +1,17 @@
+model
+    {
+        for(i in 1 : N) {
+            Y[i] ~ dbeta(w[i],d[i])
+            w[i] <- mu[i]*phi[i]
+            d[i] <- phi[i] - mu[i]*phi[i]
+            logit(mu[i]) <-   b[1] + u[subject[i],1]
+            phi[i] <- exp(-1*(b[2] + u[subject[i],2]))
+        }
+        for(j in 1 : M) {
+            u[j,1:2] ~ dmnorm(zero[1:2],T[1:2,1:2])
+        }
+        for (k in 1:2) { b[k] ~ dflat() }
+        for (i in 1:2) {zero[i] <- 0}
+        T[1:2,1:2] ~ dwish(R[,],2)   
+        V[1:2,1:2] <- inverse(T[1:2,1:2])
+    }

@@ -1,0 +1,1896 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass article
+\begin_preamble
+
+\usepackage{amsthm}\usepackage{epsfig}\usepackage{psfrag}\usepackage{lineno}
+
+\bibliographystyle{apalike}
+
+%\setlength{\evensidemargin}{0in} \setlength{\oddsidemargin}{0in}
+%\setlength{\topmargin}{0.0in} \setlength{\textwidth}{6.5in}
+%\setlength{\textheight}{9in} \setlength{\topskip}{0in}
+%\setlength{\headheight}{0in} \setlength{\headsep}{0in}
+\end_preamble
+\use_default_options false
+\begin_modules
+sweave
+\end_modules
+\maintain_unincluded_children false
+\language english
+\language_package none
+\inputencoding auto
+\fontencoding default
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize 12
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_amsmath 2
+\use_esint 1
+\use_mhchem 0
+\use_mathdots 0
+\cite_engine natbib_authoryear
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Using R2admb
+\end_layout
+
+\begin_layout Author
+Jeff Laake
+\end_layout
+
+\begin_layout Standard
+The R package R2admb can be used to run admb and pull results into a list
+ rather than looking through all of the various output files.
+ The data and parameter starting values can be specified separately from
+ the objective function definition in a .TPL file which can be useful for
+ fitting the same model to various data and for simulation.
+ The first step is to install the R2admb package from CRAN and then for
+ each session load the package from the library.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+<<eval=FALSE>>=
+\end_layout
+
+\begin_layout Plain Layout
+
+install.packages("R2admb")
+\end_layout
+
+\begin_layout Plain Layout
+
+@
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+and then for each session load the package from the library:
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+<<>>=
+\end_layout
+
+\begin_layout Plain Layout
+
+library(R2admb)
+\end_layout
+
+\begin_layout Plain Layout
+
+@
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+The package has standard help files and a vignette (pdf of examples with
+ an explanation) which can be accessed with vignette(
+\begin_inset Quotes eld
+\end_inset
+
+R2admb
+\begin_inset Quotes erd
+\end_inset
+
+) in R.
+\end_layout
+
+\begin_layout Standard
+The package has a function setup_admb() which sets two environment variables:
+ ADMB_HOME and PATH to specify the path so that all of the admb and gcc
+ executable files can be found.
+ That function only needs to be run once for every R session.
+ If it doesn't work there is a very simple fix.
+ The function setup_admb is setting the PATH for the executable files which
+ admb does in its command window format.
+ If you run the admb command window and type PATH you'll see that it adds
+ some directories.
+ For my installation that was 
+\begin_inset Quotes eld
+\end_inset
+
+c:/admb/bin;c:admb/utilities;c:/MinGW/bin
+\begin_inset Quotes erd
+\end_inset
+
+.
+ To set the environment variables without using setup_admb use the following:
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+<<>>=
+\end_layout
+
+\begin_layout Plain Layout
+
+Sys.setenv(PATH = paste("c:/admb/bin;c:admb/utilities;c:/MinGW/bin;",
+\end_layout
+
+\begin_layout Plain Layout
+
+                         Sys.getenv("PATH"),sep=";"))
+\end_layout
+
+\begin_layout Plain Layout
+
+Sys.setenv(ADMB_HOME = "c:/admb") 
+\end_layout
+
+\begin_layout Plain Layout
+
+@
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+To implement this for your system, replace 
+\begin_inset Quotes eld
+\end_inset
+
+c:/admb/bin; c:admb/utilities; c:/MinGW/ bin;
+\begin_inset Quotes eld
+\end_inset
+
+ with the directories on your system and 
+\begin_inset Quotes eld
+\end_inset
+
+c:/admb
+\begin_inset Quotes erd
+\end_inset
+
+ with the directory for your admb installation.
+ This needs to be done for each R session unless you modify the environment
+ variables permanently in the Control Panel/System/Advanced System Settings/Envi
+ronment Variables.
+\end_layout
+
+\begin_layout Standard
+Once R2admb knows about your admb set up, then there are 3 steps: 1) compiling
+ the TPL, 2) running the executable, 3) reading in the output files.
+ These are done with the R2admb functions compile_admb, run_admb, and read_admb.
+ Each assumes that the files are in your working R directory.
+ Either start R with a workspace in the working directory you want (i.e.,
+ double-clicking a .Rdata file) or use the R function setwd to set the working
+ directory.
+ Below I set the working directory to the location of lecture8 on my machine.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+<<eval=FALSE>>=
+\end_layout
+
+\begin_layout Plain Layout
+
+setwd("c:/users/jlaake/desktop/andre's course/lecture8")
+\end_layout
+
+\begin_layout Plain Layout
+
+@
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+Next, I run the 3 functions and then show the structure of the results stored
+ in lect8a.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+<<>>=
+\end_layout
+
+\begin_layout Plain Layout
+
+compile_admb("lect8a")
+\end_layout
+
+\begin_layout Plain Layout
+
+run_admb("lect8a")
+\end_layout
+
+\begin_layout Plain Layout
+
+lect8a=read_admb("lect8a")
+\end_layout
+
+\begin_layout Plain Layout
+
+str(lect8a)
+\end_layout
+
+\begin_layout Plain Layout
+
+@
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+You can extract the elements of the list directly or more easily use the
+ extractor functions used with most modeling as shown below:
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+<<>>=
+\end_layout
+
+\begin_layout Plain Layout
+
+summary(lect8a)
+\end_layout
+
+\begin_layout Plain Layout
+
+logLik(lect8a)
+\end_layout
+
+\begin_layout Plain Layout
+
+AIC(lect8a)
+\end_layout
+
+\begin_layout Plain Layout
+
+coef(lect8a)
+\end_layout
+
+\begin_layout Plain Layout
+
+vcov(lect8a)
+\end_layout
+
+\begin_layout Plain Layout
+
+confint(lect8a)
+\end_layout
+
+\begin_layout Plain Layout
+
+@
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+An alternative is to use the function do_admb which does each step.
+ The function is designed to work with a skeleton TPL file and specified
+ data and params arguments.
+ However, it can work with an existing complete TPL file if you specify
+ the run options as shown below:
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+<<>>=
+\end_layout
+
+\begin_layout Plain Layout
+
+# For checkdata and checkparam you can also use stop or warn but 
+\end_layout
+
+\begin_layout Plain Layout
+
+# do not use write if your TPL file is complete.
+ Also, don't use
+\end_layout
+
+\begin_layout Plain Layout
+
+# clean_files="all" or it will delete your .dat file as well.
+\end_layout
+
+\begin_layout Plain Layout
+
+run.options=run.control(write_files=FALSE,checkparam="ignore",
+\end_layout
+
+\begin_layout Plain Layout
+
+                           checkdata="ignore",clean_files="output")
+\end_layout
+
+\begin_layout Plain Layout
+
+lect8a=do_admb("lect8a",run.opts=run.options)
+\end_layout
+
+\begin_layout Plain Layout
+
+summary(lect8a)
+\end_layout
+
+\begin_layout Plain Layout
+
+@
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+You can also use do_admb to build the data and parameters section and include
+ a TPL file that only specifies code needed for the objective function calculati
+on.
+ For example, I've edited Lect8a.tpl to create Lect8c.tpl which has the following
+ contents:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename pasted1.png
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Contents of Lect8c.tpl
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+I can then run the model with the data as specified in Lect8a.tpl and as
+ you see below we get the same results:
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+<<>>=
+\end_layout
+
+\begin_layout Plain Layout
+
+run.options=run.control(checkparam="write",checkdata="write",
+\end_layout
+
+\begin_layout Plain Layout
+
+                           clean_files="all") 
+\end_layout
+
+\begin_layout Plain Layout
+
+lect8c=do_admb("lect8c",params=list(a=0,b=0),
+\end_layout
+
+\begin_layout Plain Layout
+
+        data=list(NData=6,x=c(1,2,2,5,3,4),y=c(4,6,7,10,8,12)), 
+\end_layout
+
+\begin_layout Plain Layout
+
+        objfunname="obj_fun",run.opts=run.options)   
+\end_layout
+
+\begin_layout Plain Layout
+
+summary(lect8c)
+\end_layout
+
+\begin_layout Plain Layout
+
+@
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+Notice that the model file name is Lect8c_gen.
+ The original Lect8c.tpl file is left intact and it creates Lect8c_gen.tpl
+ with the added data and parameter sections.
+ Lect8c_gen.tpl is compiled, run and the output files are read into the R
+ object lect8c and the files that were created are deleted because clean_files=
+\begin_inset Quotes erd
+\end_inset
+
+all
+\begin_inset Quotes erd
+\end_inset
+
+.
+ If you use 
+\begin_inset Quotes eld
+\end_inset
+
+f
+\begin_inset Quotes erd
+\end_inset
+
+ as the name of the objective function, then you need not specify objfunname.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+<<echo=FALSE>>=
+\end_layout
+
+\begin_layout Plain Layout
+
+set.seed(12345)
+\end_layout
+
+\begin_layout Plain Layout
+
+@
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The ability to write to the data and parameter sections of the TPL file
+ is quite useful.
+ I'll demonstrate with a simple but not so useful example of a parametric
+ bootstrap for the linear regression problem in Lect8a.
+ I'll construct 50 sets of random y's from the estimated intercept and slope
+ and residual standard deviation, run the model and extract the estimated
+ coefficients and compute the mean of the coefficients.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+<<badsim>>=
+\end_layout
+
+\begin_layout Plain Layout
+
+run.options=run.control(checkparam="write",checkdata="write",
+\end_layout
+
+\begin_layout Plain Layout
+
+                           clean_files="all")
+\end_layout
+
+\begin_layout Plain Layout
+
+x=c(1,2,2,5,3,4)
+\end_layout
+
+\begin_layout Plain Layout
+
+reps=50
+\end_layout
+
+\begin_layout Plain Layout
+
+int=coef(lect8c)["a"]
+\end_layout
+
+\begin_layout Plain Layout
+
+slope=coef(lect8c)["b"]
+\end_layout
+
+\begin_layout Plain Layout
+
+stdev=sqrt(-logLik(lect8c)/4)
+\end_layout
+
+\begin_layout Plain Layout
+
+coef.matrix=matrix(NA,nrow=reps,ncol=2)
+\end_layout
+
+\begin_layout Plain Layout
+
+for(i in 1:reps)
+\end_layout
+
+\begin_layout Plain Layout
+
+{
+\end_layout
+
+\begin_layout Plain Layout
+
+  y=rnorm(6,mean=int+slope*x,sd=stdev)
+\end_layout
+
+\begin_layout Plain Layout
+
+  lect8c=do_admb("lect8c",params=list(a=0,b=0),
+\end_layout
+
+\begin_layout Plain Layout
+
+        data=list(NData=6,x=x,y=y),       
+\end_layout
+
+\begin_layout Plain Layout
+
+        objfunname="obj_fun",run.opts=run.options)              
+\end_layout
+
+\begin_layout Plain Layout
+
+  coef.matrix[i,]=coef(lect8c)
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+colMeans(coef.matrix)
+\end_layout
+
+\begin_layout Plain Layout
+
+clean_admb("lect8c_gen")
+\end_layout
+
+\begin_layout Plain Layout
+
+@
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Although that works, it is not particularly clever because we are creating
+ and compiling the code for each replicate even though we are only changing
+ the data.
+ If you are only changing the data then it would be best to create and compile
+ the code once and only re-write the data file for each replicate:
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+<<goodsim>>=
+\end_layout
+
+\begin_layout Plain Layout
+
+run.options=run.control(checkparam="write",checkdata="write",
+\end_layout
+
+\begin_layout Plain Layout
+
+                           clean_files="output")
+\end_layout
+
+\begin_layout Plain Layout
+
+x=c(1,2,2,5,3,4)
+\end_layout
+
+\begin_layout Plain Layout
+
+y=c(4,6,7,10,8,12)
+\end_layout
+
+\begin_layout Plain Layout
+
+lect8c=do_admb("lect8c",params=list(a=0,b=0),
+\end_layout
+
+\begin_layout Plain Layout
+
+        data=list(NData=6,x=x,y=y),       
+\end_layout
+
+\begin_layout Plain Layout
+
+        objfunname="obj_fun",run.opts=run.options)              
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+reps=1000
+\end_layout
+
+\begin_layout Plain Layout
+
+int=coef(lect8c)["a"]
+\end_layout
+
+\begin_layout Plain Layout
+
+slope=coef(lect8c)["b"]
+\end_layout
+
+\begin_layout Plain Layout
+
+stdev=sqrt(-logLik(lect8c)/4)
+\end_layout
+
+\begin_layout Plain Layout
+
+coef.matrix=matrix(NA,nrow=reps,ncol=2)
+\end_layout
+
+\begin_layout Plain Layout
+
+for( i in 1:reps)
+\end_layout
+
+\begin_layout Plain Layout
+
+{
+\end_layout
+
+\begin_layout Plain Layout
+
+  y=rnorm(6,mean=int+slope*x,sd=stdev)
+\end_layout
+
+\begin_layout Plain Layout
+
+  write(6,"Lect8c_gen.dat")
+\end_layout
+
+\begin_layout Plain Layout
+
+  write(x,"Lect8c_gen.dat",append=TRUE)
+\end_layout
+
+\begin_layout Plain Layout
+
+  write(y,"Lect8c_gen.dat",append=TRUE)
+\end_layout
+
+\begin_layout Plain Layout
+
+  run_admb("lect8c_gen")
+\end_layout
+
+\begin_layout Plain Layout
+
+  lect8c=read_admb("lect8c_gen")
+\end_layout
+
+\begin_layout Plain Layout
+
+  clean_admb("lect8c_gen",which="output")             
+\end_layout
+
+\begin_layout Plain Layout
+
+  coef.matrix[i,]=coef(lect8c)
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+colMeans(coef.matrix)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+@
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+The code above takes only slightly longer to run 1000 reps as the first
+ took to run 50 reps due to the overhead of creating and compiling the code.
+\end_layout
+
+\begin_layout Standard
+By integrating R and ADMB, R2admb enables using all of the tools in R to
+ extend the abilities of ADMB.
+ Instead of editing and modifying the TPL file to create different models,
+ the TPL file can be written more generally and R can become the driver
+ to create different models.
+ One way this can be done is to use model.matrix in R to create design matrices
+ from data and a formula that are used as data to the ADMB model.
+ I'll start with the example of a linear model with normal errors.
+ This extends the simple.tpl example with ADMB to work with any linear model.
+ The modified TPL file is lm.tpl containing:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename paste2.PNG
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+Contents of lm.tpl
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+Using lm.tpl any linear model can be run by creating the appropriate data.
+ The function lm_admb shown below will fit any linear model with lm.tpl and
+ a specified formula and data frame.
+ I show an example using the iris data in R and show that it produces the
+ same results as lm in R:
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+<<>>=
+\end_layout
+
+\begin_layout Plain Layout
+
+lm_admb=function(formula,data)
+\end_layout
+
+\begin_layout Plain Layout
+
+{
+\end_layout
+
+\begin_layout Plain Layout
+
+  # create the design matrix with R's model.matrix
+\end_layout
+
+\begin_layout Plain Layout
+
+  xmat=model.matrix(formula,data) 
+\end_layout
+
+\begin_layout Plain Layout
+
+  # extract the dependent variable y 
+\end_layout
+
+\begin_layout Plain Layout
+
+  y=data[,all.vars(formula)[1]]
+\end_layout
+
+\begin_layout Plain Layout
+
+  # set options to write data section, include beta
+\end_layout
+
+\begin_layout Plain Layout
+
+  # in parameters and clean up files
+\end_layout
+
+\begin_layout Plain Layout
+
+  run.options=run.control(checkparam="write",checkdata="write",
+\end_layout
+
+\begin_layout Plain Layout
+
+                           clean_files="output")
+\end_layout
+
+\begin_layout Plain Layout
+
+  # run do_admb to build and run admb
+\end_layout
+
+\begin_layout Plain Layout
+
+  results=do_admb("lm",params=list(beta=rep(0,ncol(xmat))),
+\end_layout
+
+\begin_layout Plain Layout
+
+        data=list(nobs=nrow(data),y=y,ncol=ncol(xmat),xmat=xmat),
+\end_layout
+
+\begin_layout Plain Layout
+
+        run.opts=run.options)
+\end_layout
+
+\begin_layout Plain Layout
+
+  # replace generic names used in admb with the names
+\end_layout
+
+\begin_layout Plain Layout
+
+  # created by model.matrix from the formula
+\end_layout
+
+\begin_layout Plain Layout
+
+  beta.names=colnames(xmat)
+\end_layout
+
+\begin_layout Plain Layout
+
+  names(results$coefficients)=beta.names
+\end_layout
+
+\begin_layout Plain Layout
+
+  rownames(results$vcov)=beta.names
+\end_layout
+
+\begin_layout Plain Layout
+
+  colnames(results$vcov)=beta.names
+\end_layout
+
+\begin_layout Plain Layout
+
+  rownames(results$cor)=beta.names
+\end_layout
+
+\begin_layout Plain Layout
+
+  colnames(results$cor)=beta.names
+\end_layout
+
+\begin_layout Plain Layout
+
+  return(results)
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+# call lm_admb to fit model
+\end_layout
+
+\begin_layout Plain Layout
+
+lm_admb(Sepal.Length~Sepal.Width*Species,data=iris)
+\end_layout
+
+\begin_layout Plain Layout
+
+# run R's lm to compare
+\end_layout
+
+\begin_layout Plain Layout
+
+lm(Sepal.Length~Sepal.Width*Species,data=iris) 
+\end_layout
+
+\begin_layout Plain Layout
+
+@
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+While the linear model code may not be particularly useful, the concept
+ extends to non-linear models.
+ Even though the base model may be non-linear, portions of the model may
+ be linear or parameters may be linear functions of covariates through a
+ link function (e.g., log).
+ An example is fitting a detection function g(x) (probability of detecting
+ an object at distance x; g(0)=1) to line transect data.
+ Two common detection functions are the half-normal and the hazard rate
+ which can be expressed as:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+g(x)=\exp(-x^{2}/(2\sigma^{2})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+and
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+g(x)=1-\exp(-(x/\sigma)^{-p})\qquad.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+The objective function is the negative log-likelihood which is:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+-\log\prod_{i=1}^{n}f(x_{i})=-\log\prod_{i=1}^{n}\frac{g(x_{i})}{\int_{0}^{w}g(u)du}=-\log\sum_{i=1}^{n}g(x_{i})+n\log(\int_{0}^{w}g(u)du)\qquad,
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\shape italic
+w
+\shape default
+ is the half-width of the line-transect.
+ Often the detection function also depends on other variables (
+\begin_inset Formula $\mathbf{z}$
+\end_inset
+
+).
+ These variables can change the scale (
+\begin_inset Formula $\sigma$
+\end_inset
+
+) and shape (
+\shape italic
+p
+\shape default
+) of the detection function and their relationship can be modeled by expressing
+ the log of the parameters as a linear function of the covariates to bound
+ the values of the parameters to be greater than zero.
+ To restrict the shape of the hazard function, you can also replace -
+\shape italic
+p
+\shape default
+ with -(1+
+\shape italic
+p
+\shape default
+) so the exponent is bounded below by 1.
+ With the inclusion of 
+\begin_inset Formula $\mathbf{z}$
+\end_inset
+
+, the log-likelihood becomes:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+-\log\prod_{i=1}^{n}f(x_{i})=-\log\prod_{i=1}^{n}\frac{g(x_{i},\mathbf{z}_{i})}{\int_{0}^{w}g(u,\mathbf{z}_{i})du}=-\log\sum_{i=1}^{n}g(x_{i},\mathbf{z}_{i})+\sum_{i=1}^{n}\log(\int_{0}^{w}g(u,\mathbf{z}_{i})du)\qquad.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Inclusion of the covariates uses the same approach as the lm example above,
+ in which the design matrix for the parameter is input as data.
+ For example, if 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ depends on sex, the formula would be ~sex and the design matrix would have
+ 2 columns: an intercept and a column for male which is the amount males
+ differ from females using the standard treatment contrast for constructing
+ design matrices from factor variables with a formula in R.
+ The equation for sigma would be: 
+\begin_inset Formula $\sigma=\exp(X\beta)$
+\end_inset
+
+ where the design matrix 
+\begin_inset Formula $X$
+\end_inset
+
+ has a row for each observation and 2 columns, the first being all 1s and
+ the second being 0 for females and 1 for males.
+ 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+The parameter vector
+\begin_inset Formula $\beta$
+\end_inset
+
+ would have 2 values for the intercept and sex(male) effect.
+ Any formula based on the data could be used for 
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+
+\begin_inset Formula $\sigma$
+\end_inset
+
+ and 
+\shape italic
+p.
+ 
+\end_layout
+
+\begin_layout Standard
+To make this generally useful we can structure the DATA section to allow
+ any number of parameters and any number of columns for the design matrix
+ for each parameter.
+ Also, for this specific example we need to specify which detection function
+ to use.
+ The following are the DATA and PARAMETER sections of distcov.tpl:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename paste3.PNG
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+DATA and PARAMETER sections of distcov.tpl.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+The input data are:
+\end_layout
+
+\begin_layout Itemize
+number of observations
+\end_layout
+
+\begin_layout Itemize
+vector of distances for each observation
+\end_layout
+
+\begin_layout Itemize
+transect half-width
+\end_layout
+
+\begin_layout Itemize
+1 or 2 to designate which detection function to use
+\end_layout
+
+\begin_layout Itemize
+number of parameter types (not needed for this example because is depends
+ on the detection function; but written this way to show the generality
+ of the approach for other problems)
+\end_layout
+
+\begin_layout Itemize
+the link function for each parameter (1=identity, 2=log, 3=logit); this
+ could be expanded and only log is needed for this example
+\end_layout
+
+\begin_layout Itemize
+the number of columns in the design matrix for each parameter
+\end_layout
+
+\begin_layout Itemize
+a 3d array of the design matrices with the first dimension being the parameter
+\end_layout
+
+\begin_layout Standard
+The only parameter in the PARAMETER section is the ragged-array beta which
+ has a row (vector) for each parameter type and the vector contains a parameter
+ for each column in the design matrix for that parameter.
+ The remainder of the definitions in the section are temporary variables
+ used to hold calculated real (inverse-link) parameters and the integral.
+\end_layout
+
+\begin_layout Standard
+The PROCEDURE section distcov.tpl contains two functions: 
+\end_layout
+
+\begin_layout Itemize
+reals (Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:reals function"
+
+\end_inset
+
+) which computes the real parameters from design matrix, beta parameters
+ and the specified link function; additional links could be easily added.
+\end_layout
+
+\begin_layout Itemize
+fct (Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:fct function"
+
+\end_inset
+
+) which computes the value of the detection function for a specified distance
+ and real parameter vector; additional detection functions could be easily
+ added as well.
+\end_layout
+
+\begin_layout Standard
+The calculation of the objective function (Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:PROCEDURE"
+
+\end_inset
+
+) has 2 loops.
+ The first loops over the each parameter type and creates the real parameters
+ for each observation and stores the values in the column of parmat for
+ each parameter type.
+ The second loops over the observations to calculate the negative log-likelihood
+ value for each observation which includes computing the integral with the
+ built-in function adromb which calls fct to integrate the detection function.
+\end_layout
+
+\begin_layout Standard
+The TPL file can stand alone and any number of models can be run by modifying
+ the DAT file.
+ This is most easily and reliably done with code in R that creates the DAT
+ file from the data frame and the formula(s) for the parameters.
+ The following is a function fitds which takes the following arguments:
+\end_layout
+
+\begin_layout Itemize
+obs - data frame of observations
+\end_layout
+
+\begin_layout Itemize
+width - transect half-width
+\end_layout
+
+\begin_layout Itemize
+detfct - 
+\begin_inset Quotes eld
+\end_inset
+
+hn
+\begin_inset Quotes erd
+\end_inset
+
+ for half-normal and 
+\begin_inset Quotes eld
+\end_inset
+
+haz
+\begin_inset Quotes erd
+\end_inset
+
+ for hazard-rate
+\end_layout
+
+\begin_layout Itemize
+scale.formula - formula for 
+\begin_inset Formula $\sigma$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+exponent.formula - formula for 
+\shape italic
+p 
+\shape default
+only used for hazard-rate
+\end_layout
+
+\begin_layout Standard
+With the arguments specified, it creates the necessary DAT file to run the
+ model.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+<<>>=
+\end_layout
+
+\begin_layout Plain Layout
+
+fitds=function(obs,width,detfct="hn",scale.formula=~1,
+\end_layout
+
+\begin_layout Plain Layout
+
+                exponent.formula=~1)
+\end_layout
+
+\begin_layout Plain Layout
+
+{
+\end_layout
+
+\begin_layout Plain Layout
+
+  # create scale design matrix with formula and data
+\end_layout
+
+\begin_layout Plain Layout
+
+  scale_mat=model.matrix(scale.formula,obs)
+\end_layout
+
+\begin_layout Plain Layout
+
+  if(detfct=="haz")
+\end_layout
+
+\begin_layout Plain Layout
+
+    exponent_mat=model.matrix(exponent.formula,obs)
+\end_layout
+
+\begin_layout Plain Layout
+
+  # write out data file
+\end_layout
+
+\begin_layout Plain Layout
+
+  con=file(paste(tplfile,".dat",sep=""),open="wt")
+\end_layout
+
+\begin_layout Plain Layout
+
+  writeLines(as.character(nrow(obs)),con)
+\end_layout
+
+\begin_layout Plain Layout
+
+  write(obs$distance,con,ncolumns=1)
+\end_layout
+
+\begin_layout Plain Layout
+
+  writeLines(as.character(width),con)
+\end_layout
+
+\begin_layout Plain Layout
+
+  if(detfct=="haz")
+\end_layout
+
+\begin_layout Plain Layout
+
+  {
+\end_layout
+
+\begin_layout Plain Layout
+
+     writeLines("2",con)
+\end_layout
+
+\begin_layout Plain Layout
+
+     writeLines("2",con)
+\end_layout
+
+\begin_layout Plain Layout
+
+     writeLines("2  2",con)
+\end_layout
+
+\begin_layout Plain Layout
+
+     writeLines(paste(ncol(scale_mat)," ",
+\end_layout
+
+\begin_layout Plain Layout
+
+                      ncol(exponent_mat),sep=""),con)
+\end_layout
+
+\begin_layout Plain Layout
+
+     write(t(scale_mat),con,ncolumns=ncol(scale_mat))
+\end_layout
+
+\begin_layout Plain Layout
+
+     write(t(exponent_mat),con,ncolumns=ncol(exponent_mat))
+\end_layout
+
+\begin_layout Plain Layout
+
+  }else
+\end_layout
+
+\begin_layout Plain Layout
+
+  {
+\end_layout
+
+\begin_layout Plain Layout
+
+     writeLines("1",con)
+\end_layout
+
+\begin_layout Plain Layout
+
+     writeLines("1",con)
+\end_layout
+
+\begin_layout Plain Layout
+
+     writeLines("2",con)
+\end_layout
+
+\begin_layout Plain Layout
+
+     writeLines(paste(ncol(scale_mat),sep=""),con)
+\end_layout
+
+\begin_layout Plain Layout
+
+     write(t(scale_mat),con,ncolumns=ncol(scale_mat))
+\end_layout
+
+\begin_layout Plain Layout
+
+   }   
+\end_layout
+
+\begin_layout Plain Layout
+
+  close(con)
+\end_layout
+
+\begin_layout Plain Layout
+
+  run_admb(tplfile)
+\end_layout
+
+\begin_layout Plain Layout
+
+  results=read_admb(tplfile)
+\end_layout
+
+\begin_layout Plain Layout
+
+  cnames=paste("scale:",colnames(scale_mat),sep="")
+\end_layout
+
+\begin_layout Plain Layout
+
+  if(detfct=="haz")
+\end_layout
+
+\begin_layout Plain Layout
+
+    cnames=c(cnames,paste("exponent:",colnames(exponent_mat),sep=""))
+\end_layout
+
+\begin_layout Plain Layout
+
+  names(results$coefficients)=cnames
+\end_layout
+
+\begin_layout Plain Layout
+
+  rownames(results$vcov)=cnames
+\end_layout
+
+\begin_layout Plain Layout
+
+  colnames(results$vcov)=cnames
+\end_layout
+
+\begin_layout Plain Layout
+
+  return(results)
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+@
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+To run the model, we need to compile the TPL file, write the data, run the
+ model and extract the results.
+ Here we use the modularized approach by calling compile_admb, run_admb,
+ and read_admb because we only want to compile the TPL file once and then
+ run each model by modifying the data file.
+ The following example uses the golf tee data that are contained in the
+ package mrds (mark-recapture distance sampling) that is on CRAN.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+<<>>=
+\end_layout
+
+\begin_layout Plain Layout
+
+tplfile="distcov"
+\end_layout
+
+\begin_layout Plain Layout
+
+# compile tpl file
+\end_layout
+
+\begin_layout Plain Layout
+
+compile_admb(tplfile)
+\end_layout
+
+\begin_layout Plain Layout
+
+# get data from golf tee data in mrds
+\end_layout
+
+\begin_layout Plain Layout
+
+library(mrds)
+\end_layout
+
+\begin_layout Plain Layout
+
+data(book.tee.data)
+\end_layout
+
+\begin_layout Plain Layout
+
+obs=book.tee.data$book.tee.dataframe
+\end_layout
+
+\begin_layout Plain Layout
+
+obs=obs[obs$observer==1,]
+\end_layout
+
+\begin_layout Plain Layout
+
+obs=obs[obs$detected==1,]
+\end_layout
+
+\begin_layout Plain Layout
+
+# fit for different models
+\end_layout
+
+\begin_layout Plain Layout
+
+model1=fitds(obs,4,"haz",~1,~sex)
+\end_layout
+
+\begin_layout Plain Layout
+
+model1
+\end_layout
+
+\begin_layout Plain Layout
+
+model2=fitds(obs,4,"haz",~sex,~sex)
+\end_layout
+
+\begin_layout Plain Layout
+
+model2
+\end_layout
+
+\begin_layout Plain Layout
+
+model3=fitds(obs,4,"hn",~sex+size)
+\end_layout
+
+\begin_layout Plain Layout
+
+model3
+\end_layout
+
+\begin_layout Plain Layout
+
+model4=fitds(obs,4,"hn",~sex+exposure)
+\end_layout
+
+\begin_layout Plain Layout
+
+model4
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+@
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename paste4.PNG
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:reals function"
+
+\end_inset
+
+Function reals in PROCEDURE section of distcov.tpl.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename paste5.PNG
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:fct function"
+
+\end_inset
+
+Function fct in PROCEDURE section of distcov.tpl.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename paste6.PNG
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:PROCEDURE"
+
+\end_inset
+
+PROCEDURE section of distcov.tpl.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
