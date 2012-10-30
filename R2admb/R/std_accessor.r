@@ -4,8 +4,28 @@
 #'from ADMB model fits
 #'
 #'
+#' @usage \method{AIC}{admb}(object,...,k=2)
+#'           \method{vcov}{admb}(object,...)
+#'           \method{logLik}{admb}(object,...)
+#'           \method{summary}{admb}(object,...)
+#'           \method{stdEr}{admb}(x,...)
+#'           \method{print}{admb}(x,...)
+#'           \method{coef}{admb}(object,...)
+#'           \method{confint}{admb}(object,...)
+#'           \method{deviance}{admb}(object,...)
+#' @S3method print admb
+#' @S3method print summary.admb
+#' @S3method summary admb
+#' @S3method AIC admb
+#' @S3method vcov admb
+#' @S3method logLik admb
+#' @S3method stdEr admb
+#' @S3method coef admb
+#' @S3method confint admb
+#' @S3method deviance admb
 #'@aliases AIC.admb vcov.admb logLik.admb coef.admb confint.admb deviance.admb
 #'stdEr stdEr.admb
+#'@param x an ADMB model fit (of class "admb")
 #'@param object an ADMB model fit (of class "admb")
 #'@param k penalty value for AIC fits
 #'@param type which type of parameters report. "par": parameters only; "extra":

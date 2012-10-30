@@ -13,8 +13,7 @@
 #'@param mcmc2 MCMC2 steps (see ADMB-RE manual)
 #'@param mcsave Thinning interval for values saved in the PSV file.  Default is
 #'\code{pmax(1,floor(mcmc/1000))}, i.e. aim to save 1000 steps
-#'@param mcnoscale don't rescale step size for mcmc depending on acceptance
-#'rate
+#'@param mcnoscale don't rescale step size for mcmc depending on acceptance rate
 #'@param mcgrope (double) Use a candidate distribution that is a mixture of a
 #'multivariate normal and a fatter-tailed distribution with a proportion
 #'\code{mcmcgrope} of the fatter-tailed distribution; the ADMB manual suggests
@@ -32,6 +31,7 @@
 #'@note Some options (\code{mcmc2}, etc.) that can be used in AD Model Builder
 #'and ADMB-RE may not be available
 #'@author Ben Bolker
+#' @export
 #'@keywords misc
 #'@examples
 #'

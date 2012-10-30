@@ -1108,7 +1108,7 @@ and
 \begin_layout Standard
 \begin_inset Formula 
 \[
-g(x)=1-\exp(-(x/\sigma)^{-p})\qquad.
+g(x)=1-\exp(-(x/\sigma)^{-p})\;.
 \]
 
 \end_inset
@@ -1124,7 +1124,7 @@ The objective function is the negative log-likelihood which is:
 \begin_layout Standard
 \begin_inset Formula 
 \[
--\log\prod_{i=1}^{n}f(x_{i})=-\log\prod_{i=1}^{n}\frac{g(x_{i})}{\int_{0}^{w}g(u)du}=-\log\sum_{i=1}^{n}g(x_{i})+n\log(\int_{0}^{w}g(u)du)\qquad,
+-\log\prod_{i=1}^{n}f(x_{i})=-\log\prod_{i=1}^{n}\frac{g(x_{i})}{\int_{0}^{w}g(u)du}=-\log\sum_{i=1}^{n}g(x_{i})+n\log(\int_{0}^{w}g(u)du)\;,
 \]
 
 \end_inset
@@ -1174,7 +1174,7 @@ p
 \begin_layout Standard
 \begin_inset Formula 
 \[
--\log\prod_{i=1}^{n}f(x_{i})=-\log\prod_{i=1}^{n}\frac{g(x_{i},\mathbf{z}_{i})}{\int_{0}^{w}g(u,\mathbf{z}_{i})du}=-\log\sum_{i=1}^{n}g(x_{i},\mathbf{z}_{i})+\sum_{i=1}^{n}\log(\int_{0}^{w}g(u,\mathbf{z}_{i})du)\qquad.
+-\log\prod_{i=1}^{n}f(x_{i})=-\log\prod_{i=1}^{n}\frac{g(x_{i},\mathbf{z}_{i})}{\int_{0}^{w}g(u,\mathbf{z}_{i})du}=-\log\sum_{i=1}^{n}g(x_{i},\mathbf{z}_{i})+\sum_{i=1}^{n}\log(\int_{0}^{w}g(u,\mathbf{z}_{i})du)\;.
 \]
 
 \end_inset

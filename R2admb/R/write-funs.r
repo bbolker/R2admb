@@ -5,6 +5,7 @@
 #' from glmmADMB, by Hans Skaug
 #'
 #'@aliases write_pin write_dat dat_write
+#'@export write_pin write_dat dat_write
 #'@param name (character) the base name of the file
 #'@param L a list of objects to be written to file
 #'@param append (logical) append to existing file?

@@ -9,9 +9,19 @@
 \alias{vcov.admb}
 \title{Standard accessor functions for ADMB model fits}
 \usage{
-  AIC.admb(object, ..., k = 2)
+  \method{AIC}{admb}(object,...,k=2)
+    \method{vcov}{admb}(object,...)
+    \method{logLik}{admb}(object,...)
+    \method{summary}{admb}(object,...)
+    \method{stdEr}{admb}(x,...)
+    \method{print}{admb}(x,...)
+    \method{coef}{admb}(object,...)
+    \method{confint}{admb}(object,...)
+    \method{deviance}{admb}(object,...)
 }
 \arguments{
+  \item{x}{an ADMB model fit (of class "admb")}
+
   \item{object}{an ADMB model fit (of class "admb")}
 
   \item{k}{penalty value for AIC fits}

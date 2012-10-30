@@ -5,6 +5,7 @@
 #'
 #'
 #'@aliases compile_admb run_admb read_admb
+#'@export compile_admb run_admb read_admb
 #'@param fn (character) name of TPL file, without extension
 #'@param safe (logical) Compile in safe mode?
 #'@param re (logical) Compile in random effects (ADMB-RE) mode?

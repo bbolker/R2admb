@@ -20,6 +20,7 @@
 #'
 #'@return A list with appropriate default values inserted for passing to
 #'\code{\link{do_admb}}
+#'@export
 #'@author Ben Bolker
 #'@keywords misc
 run.control <- function(check_tpl=TRUE,

@@ -22,6 +22,7 @@
 #'"output", or "all" or "none"
 #'@return A character vector containing the name of the current ADMB_HOME.
 #'@author Ben Bolker
+#'@export clean_admb setup_admb
 #'@keywords misc environment
 #'@examples
 #'

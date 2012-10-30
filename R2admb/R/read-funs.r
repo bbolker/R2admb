@@ -10,6 +10,7 @@
 #'MCMC runs
 #'
 #'@aliases read_psv read_pars
+#'@export read_psv read_pars
 #'@param fn (character) Base name of AD Model Builder
 #'@param names (character) Names of variables
 #'@param drop_phase (logical) drop negative-phase (fixed) parameters from results?
@@ -170,10 +171,10 @@ read_tpl <- function(f) {
 	##  a "SECTION" but is SEPARABLE_FUNCTION or TOP_OF_MAIN_CALCS
 	##  or something ...
 	splnames <- sapply(splsec,"[",1)
-	names(splsec) <- ifelse(grepl("SECTION$",splnames),
-			gsub("_.+","",splnames),
-			splnames)
-	# names(splsec) <- gsub("_.+","",splnames)
+#	names(splsec) <- ifelse(grepl("SECTION$",splnames),
+#			gsub("_.+","",splnames),
+#			splnames)
+	names(splsec) <- gsub("_.+","",splnames)
 	splsec_proc <- lapply(splsec,drop_calcs)
 	L1 <- L2 <- NULL
 	pp <- splsec_proc$PARAMETER
