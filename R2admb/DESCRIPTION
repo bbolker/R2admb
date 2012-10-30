@@ -26,6 +26,7 @@ Collate:
     'check_section.R'
     'do_admb.R'
     'mcmc.control.r'
+    'plot.admb_hist.r'
     'read-funs.r'
     'readfit.R'
     'run.control.r'

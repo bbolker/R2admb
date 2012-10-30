@@ -9,6 +9,9 @@
 #'deviations); and FOO.cor (correlations).  \code{read_psv} reads the output of
 #'MCMC runs
 #'
+#'@usage read_pars(fn,drop_phase=TRUE)
+#'   
+#'       read_psv(fn,names=NULL)
 #'@aliases read_psv read_pars
 #'@export read_psv read_pars
 #'@param fn (character) Base name of AD Model Builder
@@ -153,6 +156,21 @@ read_pars <- function (fn,drop_phase=TRUE) {
 			npar=npar)
 }
 
+read_psv <- function(fn,names=NULL) {
+	fn <- tolower(fn) ## arghv
+	fn <- paste(fn,"psv",sep=".")
+	if (!file.exists(fn)) stop("no PSV file found")
+	ans <- read_admbbin(fn)
+	if (is.null(names)) names <- paste("V",seq(ncol(ans)),sep="")
+	if (length(names)!=ncol(ans)) {
+		warning("mismatch between number of columns and number of names")
+		names <- c(names,paste("V",seq(length(names)+1,ncol(ans)),sep=""))
+	}
+	colnames(ans) <- names
+	ans <- as.data.frame(ans)
+	ans
+}
+
 
 
 read_tpl <- function(f) {
@@ -205,21 +223,6 @@ read_tpl <- function(f) {
 	L <- c(L1,L2)
 	L <- L[!sapply(L,is.null)]
 	list(secs=splsec,info=L[sapply(L,nrow)>0])
-}
-
-read_psv <- function(fn,names=NULL) {
-	fn <- tolower(fn) ## arghv
-	fn <- paste(fn,"psv",sep=".")
-	if (!file.exists(fn)) stop("no PSV file found")
-	ans <- read_admbbin(fn)
-	if (is.null(names)) names <- paste("V",seq(ncol(ans)),sep="")
-	if (length(names)!=ncol(ans)) {
-		warning("mismatch between number of columns and number of names")
-		names <- c(names,paste("V",seq(length(names)+1,ncol(ans)),sep=""))
-	}
-	colnames(ans) <- names
-	ans <- as.data.frame(ans)
-	ans
 }
 
 read_plt <- function(varname) {

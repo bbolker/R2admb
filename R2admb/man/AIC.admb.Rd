@@ -4,19 +4,23 @@
 \alias{confint.admb}
 \alias{deviance.admb}
 \alias{logLik.admb}
+\alias{print.admb}
 \alias{stdEr}
 \alias{stdEr.admb}
+\alias{summary.admb}
 \alias{vcov.admb}
 \title{Standard accessor functions for ADMB model fits}
 \usage{
   \method{AIC}{admb}(object,...,k=2)
-    \method{vcov}{admb}(object,...)
+    \method{vcov}{admb}(object,type=c("par","extra","all"),...)
     \method{logLik}{admb}(object,...)
-    \method{summary}{admb}(object,...)
-    \method{stdEr}{admb}(x,...)
-    \method{print}{admb}(x,...)
-    \method{coef}{admb}(object,...)
-    \method{confint}{admb}(object,...)
+    \method{summary}{admb}(object,correlation=FALSE,symbolic.cor
+    = FALSE,...)
+    \method{stdEr}{admb}(object,type=c("par","extra","all"),...)
+    \method{print}{admb}(x,verbose=FALSE,...)
+    \method{coef}{admb}(object,type=c("par","extra","all"),...)
+    \method{confint}{admb}(object, parm, level=0.95,
+    method="default",...)
     \method{deviance}{admb}(object,...)
 }
 \arguments{
@@ -40,6 +44,12 @@
   "quantile", CIs based on quantiles of the MCMC-generated
   posterior density (if MCMC was computed); "HPDinterval",
   CIs based on highest posterior density (ditto)}
+
+  \item{correlation}{currently unused parameter}
+
+  \item{symbolic.cor}{currently unused parameter}
+
+  \item{verbose}{show messages}
 
   \item{\dots}{other parameters (for S3 generic
   compatibility)}

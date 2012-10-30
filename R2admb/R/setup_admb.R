@@ -14,6 +14,9 @@
 #'
 #'The function also appends the admb_home value to the PATH variable.
 #'
+#'@usage  setup_admb(admb_home)
+#' 
+#'        clean_admb(fn,which=c("sys","output"))
 #'@aliases setup_admb clean_admb
 #'@param admb_home (character) directory containing AD Model Builder binary
 #'files

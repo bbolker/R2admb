@@ -5,13 +5,13 @@
 #'
 #'
 #' @usage \method{AIC}{admb}(object,...,k=2)
-#'           \method{vcov}{admb}(object,...)
+#'           \method{vcov}{admb}(object,type=c("par","extra","all"),...)
 #'           \method{logLik}{admb}(object,...)
-#'           \method{summary}{admb}(object,...)
-#'           \method{stdEr}{admb}(x,...)
-#'           \method{print}{admb}(x,...)
-#'           \method{coef}{admb}(object,...)
-#'           \method{confint}{admb}(object,...)
+#'           \method{summary}{admb}(object,correlation=FALSE,symbolic.cor = FALSE,...)
+#'           \method{stdEr}{admb}(object,type=c("par","extra","all"),...)
+#'           \method{print}{admb}(x,verbose=FALSE,...)
+#'           \method{coef}{admb}(object,type=c("par","extra","all"),...)
+#'           \method{confint}{admb}(object, parm, level=0.95, method="default",...)
 #'           \method{deviance}{admb}(object,...)
 #' @S3method print admb
 #' @S3method print summary.admb
@@ -24,7 +24,7 @@
 #' @S3method confint admb
 #' @S3method deviance admb
 #'@aliases AIC.admb vcov.admb logLik.admb coef.admb confint.admb deviance.admb
-#'stdEr stdEr.admb
+#'stdEr stdEr.admb summary.admb print.admb 
 #'@param x an ADMB model fit (of class "admb")
 #'@param object an ADMB model fit (of class "admb")
 #'@param k penalty value for AIC fits
@@ -37,6 +37,9 @@
 #'computed); "quantile", CIs based on quantiles of the MCMC-generated posterior
 #'density (if MCMC was computed); "HPDinterval", CIs based on highest posterior
 #'density (ditto)
+#' @param correlation currently unused parameter
+#' @param symbolic.cor currently unused parameter
+#' @param verbose show messages
 #'@param \dots other parameters (for S3 generic compatibility)
 #'@return Extracts appropriate values: numeric (scalar) for AIC, type logLik
 #'for logLik, numeric vector of coefficients, numeric variance-covariance

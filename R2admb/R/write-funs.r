@@ -4,6 +4,9 @@
 #'values and data in a format suitable for input by AD Model Builder
 #' from glmmADMB, by Hans Skaug
 #'
+#'@usage write_pin(name,L)
+#' 
+#'       write_dat(name, L, append=FALSE)
 #'@aliases write_pin write_dat dat_write
 #'@export write_pin write_dat dat_write
 #'@param name (character) the base name of the file

@@ -4,6 +4,8 @@
 \title{Set up AD Model Builder environment variables}
 \usage{
   setup_admb(admb_home)
+
+  clean_admb(fn,which=c("sys","output"))
 }
 \arguments{
   \item{admb_home}{(character) directory containing AD

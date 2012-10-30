@@ -4,7 +4,9 @@
 \alias{write_pin}
 \title{Write parameter and data files for ADMB}
 \usage{
-  write_pin(name, L)
+  write_pin(name,L)
+
+  write_dat(name, L, append=FALSE)
 }
 \arguments{
   \item{name}{(character) the base name of the file}

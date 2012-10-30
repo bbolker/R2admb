@@ -3,7 +3,9 @@
 \alias{read_psv}
 \title{Read in parameters from an AD Model Builder run}
 \usage{
-  read_pars(fn, drop_phase = TRUE)
+  read_pars(fn,drop_phase=TRUE)
+
+  read_psv(fn,names=NULL)
 }
 \arguments{
   \item{fn}{(character) Base name of AD Model Builder}

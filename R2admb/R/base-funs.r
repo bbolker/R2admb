@@ -3,7 +3,11 @@
 #'With various tests, calls the \code{admb} script to compile from a TPL file
 #'to an executable, or runs the resulting executable
 #'
-#'
+#'@usage compile_admb(fn,safe=FALSE,re=FALSE,verbose=FALSE,admb_errors=c("stop","warn","ignore"))
+#' 
+#'       run_admb(fn,verbose=FALSE,mcmc=FALSE,mcmc.opts=mcmc.control(),profile=FALSE,extra.args="",admb_errors=c("stop","warn","ignore"))
+#' 
+#'       read_admb(fn,verbose=FALSE,profile=FALSE,mcmc=FALSE,mcmc.opts=NULL,admbOut=NULL,checkterm=TRUE)
 #'@aliases compile_admb run_admb read_admb
 #'@export compile_admb run_admb read_admb
 #'@param fn (character) name of TPL file, without extension
