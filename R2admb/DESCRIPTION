@@ -1,8 +1,8 @@
 Package: R2admb
 Type: Package
 Title: ADMB to R interface functions
-Version: 0.7.5.3
-Date: 2012-07-12
+Version: 0.7.5.4
+Date: 2012-10-30
 Author: Ben Bolker, Hans Skaug
 Maintainer: Ben Bolker <bolker@mcmaster.ca>
 Description: A series of functions to call AD Model Builder (i.e.,
