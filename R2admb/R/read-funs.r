@@ -154,6 +154,7 @@ read_pars <- function (fn,drop_phase=TRUE) {
 			nopar <- readBin(filen, what = "integer", n = 1)
 			vcov <- readBin(filen, what = "double", n = nopar * nopar)
 			vcov <- matrix(vcov, byrow = TRUE, ncol = nopar)
+			close(filen)
 		} 
 	}
 #   added check if sdparnames is null
@@ -169,6 +170,7 @@ read_pars <- function (fn,drop_phase=TRUE) {
 	   hes <- readBin(filen, what = "double", n = nopar * nopar)
 	   hes <- matrix(hes, byrow = TRUE, ncol = nopar)
 	   colnames(hes) <- rownames(hes) <- sdparnames
+	   close(filen)
     } 
 #   added hes to list jll
     list(coefficients=c(est,sdrptvals),
