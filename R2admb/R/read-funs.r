@@ -163,7 +163,7 @@ read_pars <- function (fn,drop_phase=TRUE) {
 #   added jll - it appears the file is padded at the end which is why read_admbbin doesn't
 #   work; apparently need to know the number of records. For the hessian, nopar is number of rows and columns
     hes <- NULL
-    if(is.null(vcov) & file.exists("admodel.hes"))
+    if(all(is.na(vcov)) & file.exists("admodel.hes"))
     {
 	   filen <- file("admodel.hes", "rb")
 	   nopar <- readBin(filen, what = "integer", n = 1)

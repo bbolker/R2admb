@@ -23,7 +23,7 @@
   log-likelihood 5) maxgrad maximum gradient of
   log-likelihood surface 6) Object cor correlation matrix
   7) vcov variance-covariance matrix 8) npar number of
-  parameters
+  parameters 9) hes hessian matrix only if no vcov matrix
 }
 \description{
   Reads coefficients, standard errors, log-likelihoods,
@@ -34,8 +34,9 @@
   Given the output from an ADMB run on FOO.tpl,
   \code{read_pars} reads the files FOO.par (parameters,
   log-likelihood, max gradient); FOO.std (standard
-  deviations); and FOO.cor (correlations).  \code{read_psv}
-  reads the output of MCMC runs
+  deviations); FOO.cor (correlations); admodel.hes for
+  hessian; and admodel.cov for covariance matrix
+  \code{read_psv} reads the output of MCMC runs
 }
 \section{Warning}{
   The \code{coeflist} component is untested for data
