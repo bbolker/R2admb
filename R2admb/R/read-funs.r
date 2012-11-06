@@ -6,8 +6,8 @@
 #'
 #'Given the output from an ADMB run on FOO.tpl, \code{read_pars} reads the
 #'files FOO.par (parameters, log-likelihood, max gradient); FOO.std (standard
-#'deviations); and FOO.cor (correlations).  \code{read_psv} reads the output of
-#'MCMC runs
+#'deviations); FOO.cor (correlations); admodel.hes for hessian; and admodel.cov for
+#'covariance matrix  \code{read_psv} reads the output of MCMC runs
 #'
 #'@usage read_pars(fn,drop_phase=TRUE)
 #'   
@@ -26,6 +26,7 @@
 #' 6) Object cor correlation matrix
 #' 7) vcov variance-covariance matrix
 #' 8) npar number of parameters
+#' 9) hes hessian matrix only if no vcov matrix
 #'@section Warning: The \code{coeflist} component is untested for data
 #'structures more complicated than scalars, vectors or matrices (i.e. higher-dimensional or ragged arrays)
 #'@author Ben Bolker
@@ -110,6 +111,8 @@ read_pars <- function (fn,drop_phase=TRUE) {
 		cormat <- vcov <- matrix(NA,nrow=npar,ncol=npar)
 		std <- rep(NA,npar)
 		sdrptvals <- numeric(0)
+#       added jll
+		sdparnames <- NULL
 	} else {
 		nsdpar <- nrow(sd_dat)
 		## need col.names hack so read.table knows how many
@@ -143,17 +146,35 @@ read_pars <- function (fn,drop_phase=TRUE) {
 		}
 		std <- sd_dat[, 4]
 		sdrptvals <- sd_dat[-(1:npar3),3]
-		vcov <- outer(std,std) * cormat
+#       added read of binary vcov file; fair loss of precision using cor*outer(std,std) probably due
+#       to ascii text read
+		if(file.exists("admodel.cov"))
+		{
+			filen <- file("admodel.cov", "rb")
+			nopar <- readBin(filen, what = "integer", n = 1)
+			vcov <- readBin(filen, what = "double", n = nopar * nopar)
+			vcov <- matrix(vcov, byrow = TRUE, ncol = nopar)
+		} 
 	}
-	## hes <- read_admbbin("admodel.hes")
-	## FIXME: can read this, but I don't know what it means!
-	##  it doesn't seem to be the raw Hessian ...
-	names(std) <- rownames(vcov) <- rownames(cormat) <-
+#   added check if sdparnames is null
+	if(!is.null(sdparnames)) names(std) <- rownames(vcov) <- rownames(cormat) <-
 			colnames(vcov) <- colnames(cormat) <- sdparnames
-	list(coefficients=c(est,sdrptvals),
+#   added jll - it appears the file is padded at the end which is why read_admbbin doesn't
+#   work; apparently need to know the number of records. For the hessian, nopar is number of rows and columns
+    hes <- NULL
+    if(is.null(vcov) & file.exists("admodel.hes"))
+    {
+	   filen <- file("admodel.hes", "rb")
+	   nopar <- readBin(filen, what = "integer", n = 1)
+	   hes <- readBin(filen, what = "double", n = nopar * nopar)
+	   hes <- matrix(hes, byrow = TRUE, ncol = nopar)
+	   colnames(hes) <- rownames(hes) <- sdparnames
+    } 
+#   added hes to list jll
+    list(coefficients=c(est,sdrptvals),
 			coeflist=parlist,
 			se=std, loglik=-loglik, maxgrad=-maxgrad, cor=cormat, vcov=vcov,
-			npar=npar)
+			npar=npar,hes=hes)
 }
 
 read_psv <- function(fn,names=NULL) {
