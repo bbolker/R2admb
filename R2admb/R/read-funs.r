@@ -18,15 +18,17 @@
 #'@param names (character) Names of variables
 #'@param drop_phase (logical) drop negative-phase (fixed) parameters from results?
 #'@return List containing the following elements
-#' 1) coefficients: parameters estimates, 
-#' 2) coeflist parameter estimates in list format, with proper shape (vectors, matrices, etc.)
-#' 3) se estimated standard errors of coefficients
-#' 4) loglik log-likelihood
-#' 5) maxgrad maximum gradient of log-likelihood surface
-#' 6) Object cor correlation matrix
-#' 7) vcov variance-covariance matrix
-#' 8) npar number of parameters
-#' 9) hes hessian matrix only if no vcov matrix
+#' \itemize{
+#' \item{"coefficients"}{parameter estimates}
+#' \item{"coeflist"}{parameter estimates in list format, with proper shape (vectors, matrices, etc.)}
+#' \item{"se"}{estimated standard errors of coefficients}
+#' \item{"loglik"}{log-likelihood}
+#' \item{"maxgrad"}{maximum gradient of log-likelihood surface}
+#' \item{"cor"}{correlation matrix}
+#' \item{"vcov"}{variance-covariance matrix}
+#' \item{"npar"}{number of parameters}
+#' \item{"hes"}{hessian matrix (only if no vcov matrix)}
+#' }
 #'@section Warning: The \code{coeflist} component is untested for data
 #'structures more complicated than scalars, vectors or matrices (i.e. higher-dimensional or ragged arrays)
 #'@author Ben Bolker
@@ -146,25 +148,28 @@ read_pars <- function (fn,drop_phase=TRUE) {
 		}
 		std <- sd_dat[, 4]
 		sdrptvals <- sd_dat[-(1:npar3),3]
-#       added read of binary vcov file; fair loss of precision using cor*outer(std,std) probably due
-#       to ascii text read
 		if(file.exists("admodel.cov"))
 		{
-			filen <- file("admodel.cov", "rb")
-			nopar <- readBin(filen, what = "integer", n = 1)
-			vcov <- readBin(filen, what = "double", n = nopar * nopar)
-			vcov <- matrix(vcov, byrow = TRUE, ncol = nopar)
-			close(filen)
-		} 
-	}
-#   added check if sdparnames is null
-	if(!is.null(sdparnames)) names(std) <- rownames(vcov) <- rownames(cormat) <-
-			colnames(vcov) <- colnames(cormat) <- sdparnames
-#   added jll - it appears the file is padded at the end which is why read_admbbin doesn't
+                    filen <- file("admodel.cov", "rb")
+                    nopar <- readBin(filen, what = "integer", n = 1)
+                    vcov <- readBin(filen, what = "double", n = nopar * nopar)
+                    vcov <- matrix(vcov, byrow = TRUE, ncol = nopar)
+                    close(filen)
+		} else {
+                    ## fall back: less precise, prob. due to ascii text read
+                    vcov <- cormat*outer(std,std)
+                }
+            }
+        ##  check if sdparnames is null
+	if(!is.null(sdparnames)) {
+            names(std) <- rownames(vcov) <- rownames(cormat) <-
+                colnames(vcov) <- colnames(cormat) <- sdparnames
+        }
+        ##  JLL - it appears the file is padded at the end which is why read_admbbin doesn't
 #   work; apparently need to know the number of records. For the hessian, nopar is number of rows and columns
-    hes <- NULL
-    if(all(is.na(vcov)) & file.exists("admodel.hes"))
-    {
+        hes <- NULL
+        if(all(is.na(vcov)) & file.exists("admodel.hes"))
+        {
 	   filen <- file("admodel.hes", "rb")
 	   nopar <- readBin(filen, what = "integer", n = 1)
 	   hes <- readBin(filen, what = "double", n = nopar * nopar)

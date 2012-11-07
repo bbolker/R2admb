@@ -16,14 +16,17 @@
   parameters from results?}
 }
 \value{
-  List containing the following elements 1) coefficients:
-  parameters estimates, 2) coeflist parameter estimates in
-  list format, with proper shape (vectors, matrices, etc.)
-  3) se estimated standard errors of coefficients 4) loglik
-  log-likelihood 5) maxgrad maximum gradient of
-  log-likelihood surface 6) Object cor correlation matrix
-  7) vcov variance-covariance matrix 8) npar number of
-  parameters 9) hes hessian matrix only if no vcov matrix
+  List containing the following elements \itemize{
+  \item{"coefficients"}{parameter estimates}
+  \item{"coeflist"}{parameter estimates in list format,
+  with proper shape (vectors, matrices, etc.)}
+  \item{"se"}{estimated standard errors of coefficients}
+  \item{"loglik"}{log-likelihood} \item{"maxgrad"}{maximum
+  gradient of log-likelihood surface}
+  \item{"cor"}{correlation matrix}
+  \item{"vcov"}{variance-covariance matrix}
+  \item{"npar"}{number of parameters} \item{"hes"}{hessian
+  matrix (only if no vcov matrix)} }
 }
 \description{
   Reads coefficients, standard errors, log-likelihoods,
