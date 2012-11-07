@@ -88,8 +88,9 @@ setup_admb <- function(admb_home) {
 		
 		
 	} else {
-		Sys.setenv(PATH=paste(path,paste(admb_home,"bin",sep="/"),
-						sep=pathsepchr))
+            pathsepchr <-  ";"
+            Sys.setenv(PATH=paste(path,paste(admb_home,"bin",sep="/"),
+                       sep=pathsepchr))
 	}
 	admb_home
 }
