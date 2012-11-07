@@ -8,7 +8,7 @@
 #' @param rho abolute value for lower bound of correlation
 #' @return a dataframe with 3 columns var1=row name,
 #' var2= column name or number, Value of matrix element. Only contains rows
-#' in which matrix element satisfies logical expression
+#' in which matrix element satisfies logical expression.
 #' @export
 #' @author Jeff Laake
 find_large_cor=function(x,rho=0.9)

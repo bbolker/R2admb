@@ -12,7 +12,8 @@
 \value{
   a dataframe with 3 columns var1=row name, var2= column
   name or number, Value of matrix element. Only contains
-  rows in which matrix element satisfies logical expression
+  rows in which matrix element satisfies logical
+  expression.
 }
 \description{
   Find any correlations for which their absolute value
