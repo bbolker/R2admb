@@ -23,6 +23,7 @@
 #' @S3method coef admb
 #' @S3method confint admb
 #' @S3method deviance admb
+#'@export stdEr
 #'@aliases AIC.admb vcov.admb logLik.admb coef.admb confint.admb deviance.admb
 #'stdEr stdEr.admb summary.admb print.admb 
 #'@param x an ADMB model fit (of class "admb")
