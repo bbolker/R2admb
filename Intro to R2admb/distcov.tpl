@@ -15,13 +15,10 @@ PARAMETER_SECTION
    objective_function_value f;        // negative log-likelihood
 PROCEDURE_SECTION
    int i, j;
-   dvariable xx;  
 // Create matrix of real parameter values which is pt rows and n columns
    for (i=1;i<=pt;i++)
    {
-     dvar_matrix xdm=dm(i);                     // convert to dvar_ type
-     dvar_vector xbeta=beta(i);                 // convert to dvar_ type 
-     parmat(i)=reals(xdm,xbeta,links(i));
+    parmat(i)=reals(dm(i),beta(i),links(i));
    }
 // loop over each observation computing sum of log-likelihood values
    f=0;
@@ -29,14 +26,13 @@ PROCEDURE_SECTION
    {
       par=column(parmat,j);
       mu=adromb(&model_parameters::fct,0,width,8);
-	  dvariable x=xs(j);
-      f+= -log(fct(x)) + log(mu);
+      f+= -log(fct(xs(j))) + log(mu);
    }  
    
 //////////////////////////////   
 // Computes reals from betas
 //////////////////////////////   
-FUNCTION dvar_vector reals(dvar_matrix& dm, dvar_vector& beta, int ilink)
+FUNCTION dvar_vector reals(dmatrix& dm, dvar_vector& beta, int ilink)
 // dm is the design matrix
 // beta is vector of parameters - length macthes ncol(dm)
 // ilink is type of link function
