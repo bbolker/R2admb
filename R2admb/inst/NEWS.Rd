@@ -4,6 +4,14 @@
 \title{R2admb News}
 \encoding{UTF-8}
 
+\section{Changes in version 0.7.6 (2012-11-06)}{
+  \itemize{
+    \item Development migration to github
+    \item Add Jeff Laake to authors
+    \item Improved reading of hessian, vcov matrix
+  }
+}
+
 \section{Changes in version 0.7.5.3}{
   \itemize{
     \item ignore !! *after* beginning of line in variable definitions
@@ -70,6 +78,7 @@
     \item Support for profiling
     \item Support for random effects
     \item Expanded vignette
+    \item PARAMETERS and DATA section can be created automatically
 }}
 
 \section{Changes in version 0.5 (2009-11-25)}{
