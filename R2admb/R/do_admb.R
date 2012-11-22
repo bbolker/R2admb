@@ -167,12 +167,12 @@ do_admb <- function(fn,
                     if (valsOK) x else NULL  ## non-list
                 }
             })
-            res[!is.null(res)]
+            res[!sapply(res,is.null)]
         }
         if (!checkparam %in% c("write","ignore") && is.null(tplinfo$inits))
             stop("must specify PARAMETER section (or set 'checkparam' to 'write' or 'ignore')")
         if (checkparam!="ignore") {
-            if (missing(bounds)) bounds <- getvals(params,"bounds")
+            if (missing(bounds)) bounds <- getvals(params,"bounds",valsOK=FALSE)
             params <- getvals(params,"value",getFirst=TRUE,valsOK=TRUE)
             dmsg <- check_section(ofn,tpldat,"inits",params,
                                   check=checkparam,
