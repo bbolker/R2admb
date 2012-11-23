@@ -109,7 +109,8 @@ read_pars <- function (fn,drop_phase=TRUE) {
     nopar <- NULL ## in case nopar wasn't read from vcov
     ## if non-pos-def hessian, cor and std files will be missing ... but
     ##   we should still be able to retrieve some info
-    sd_dat <- rt(fn,"std", skip = 1,as.is=TRUE)
+	nopar=NULL ## set nopar to NULL for cases where it wasn't read from vcov
+	sd_dat <- rt(fn,"std", skip = 1,as.is=TRUE)
     if (length(sd_dat)==1 && is.na(sd_dat)) {
         warning("std file missing: some problem with fit, but retrieving parameter estimates anyway")
         cormat <- vcov <- matrix(NA,nrow=npar,ncol=npar)
@@ -161,7 +162,7 @@ read_pars <- function (fn,drop_phase=TRUE) {
             vcov <- cormat*outer(std,std)
         }
     }
-    ##  check if sdparnames is null
+    ##  check if sdparnames is null; jll modified to use ncol(vcov) for vcov
     if(!is.null(sdparnames)) {
         names(std) <- rownames(cormat) <- colnames(cormat) <- sdparnames
         colnames(vcov) <- rownames(vcov) <- sdparnames[seq(ncol(vcov))]
