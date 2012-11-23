@@ -104,7 +104,9 @@ read_pars <- function (fn,drop_phase=TRUE) {
     ## parnames,parlen)))
     est <- unlist(par_dat)
     names(est) <- parnames
-    if (!is.finite(loglik)) warning("bad log-likelihood: fitting problem in ADMB?")
+    if (!is.finite(loglik))
+        warning("bad log-likelihood: fitting problem in ADMB?")
+    nopar <- NULL ## in case nopar wasn't read from vcov
     ## if non-pos-def hessian, cor and std files will be missing ... but
     ##   we should still be able to retrieve some info
     sd_dat <- rt(fn,"std", skip = 1,as.is=TRUE)
@@ -113,7 +115,6 @@ read_pars <- function (fn,drop_phase=TRUE) {
         cormat <- vcov <- matrix(NA,nrow=npar,ncol=npar)
         std <- rep(NA,npar)
         sdrptvals <- numeric(0)
-                                        #       added jll
         sdparnames <- NULL
     } else {
         nsdpar <- nrow(sd_dat)
@@ -162,11 +163,12 @@ read_pars <- function (fn,drop_phase=TRUE) {
     }
     ##  check if sdparnames is null
     if(!is.null(sdparnames)) {
-        names(std) <- rownames(vcov) <- rownames(cormat) <-
-            colnames(vcov) <- colnames(cormat) <- sdparnames
+        names(std) <- rownames(cormat) <- colnames(cormat) <- sdparnames
+        colnames(vcov) <- rownames(vcov) <- sdparnames[seq(ncol(vcov))]
     }
-    ##  JLL - it appears the file is padded at the end which is why read_admbbin doesn't
-                                        #   work; apparently need to know the number of records. For the hessian, nopar is number of rows and columns
+    ##  JLL - file is padded at the end which is why read_admbbin doesn't
+    ##   work; need to know the number of records.
+    ##   For the hessian, nopar is number of rows and columns
     hes <- NULL
     if(all(is.na(vcov)) & file.exists("admodel.hes"))
     {
@@ -176,12 +178,13 @@ read_pars <- function (fn,drop_phase=TRUE) {
         hes <- matrix(hes, byrow = TRUE, ncol = nopar)
         colnames(hes) <- rownames(hes) <- sdparnames
         close(filen)
-    } 
-                                        #   added hes to list jll
+    }
+    ## return npar as number of columns in vcov and npar_total as npar+re
+    if (is.null(nopar)) nopar <- npar
     list(coefficients=c(est,sdrptvals),
          coeflist=parlist,
          se=std, loglik=-loglik, maxgrad=-maxgrad, cor=cormat, vcov=vcov,
-         npar=npar,hes=hes)
+         npar=nopar,npar_total=npar,hes=hes)
 }
 
 read_psv <- function(fn,names=NULL) {
