@@ -206,6 +206,9 @@ read_psv <- function(fn,names=NULL) {
 
 read_tpl <- function(f) {
     r <- readLines(paste(f,"tpl",sep="."))
+    ## drop blank lines at head
+    if (!nzchar(r[1]))
+        r <- r[-(1:rle(!nzchar(r))$lengths[1])]
     secStart <- which(substr(r,1,1) %in% LETTERS)
     if (length(secStart)==0) stop("tpl file must contain at least one section (capitalized header)")
     if (secStart[1]!=1) { ## add first (comments etc.) section

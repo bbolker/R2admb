@@ -2,9 +2,9 @@
 \alias{do_admb}
 \title{Compile and/or run an ADMB model, collect output}
 \usage{
-  do_admb(fn, data, params, bounds = NULL, phase = NULL,
-    re = NULL, data_type = NULL, safe = TRUE,
-    profile = FALSE, profpars = NULL, mcmc = FALSE,
+  do_admb(fn, data = NULL, params = NULL, bounds = NULL,
+    phase = NULL, re = NULL, data_type = NULL, safe = TRUE,
+    profile = NULL, profile.opts = NULL, mcmc = NULL,
     mcmc.opts = mcmc.control(), impsamp = FALSE,
     verbose = FALSE, run.opts = run.control(),
     objfunname = "f", workdir = getwd(),
@@ -14,11 +14,23 @@
   \item{fn}{(character) base name of a TPL function,
   located in the working directory}
 
-  \item{data}{a list of input data variables (order must
-  match TPL file)}
+  \item{data}{a named list of input data variables (order
+  must match TPL file): each element of the list can either
+  be a single value, or a list containing elements
+  \itemize{ \item{value}{the value of the data}
+  \item{data_type}{character: possible values as in
+  \code{\link{storage.mode}}, typically "integer" or
+  "numeric": this overrides R2admb's attempts to guess
+  whether variables are supposed to be integers or floats
+  (default NA)} }}
 
-  \item{params}{a list of starting parameter values (order
-  must match TPL file)}
+  \item{params}{a named list of starting parameter values
+  (order must match TPL file): each element of the list can
+  either be a single value, or a list containing elements
+  \itemize{ \item{value}{starting value of the parameter
+  (default 0)} \item{bounds}{two-element vector of lower
+  and upper bounds} \item{phase}{integer, specifying phase:
+  not implemented yet} }}
 
   \item{bounds}{named list of 2-element vectors of lower
   and upper bounds for specified parameters}
@@ -39,8 +51,9 @@
   \item{profile}{(logical) generate likelihood profiles?
   (untested!)}
 
-  \item{profpars}{(character) vector of names of parameters
-  to profile}
+  \item{profile.opts}{(list) list of options, including
+  \itemize{ \item{pars}{vector of names of parameters to
+  profile} }}
 
   \item{mcmc}{(logical) run MCMC around best fit?}
 
@@ -62,7 +75,8 @@
   files will be copied)}
 
   \item{admb_errors}{how to treat ADMB errors (in either
-  compilation or run): use at your own risk!}
+  compilation or run): use "ignore" option at your own
+  risk!}
 
   \item{extra.args}{(character) extra argument string to
   pass to admb}
@@ -111,6 +125,13 @@ m1 <- do_admb("tadpole",
              data=c(list(nobs=15),tadpoledat),
              params=list(c=0.45,d=13,g=1),
              bounds=list(c=c(0,1),d=c(0,50),g=c(-1,25)),
+             run.opts=run.control(checkparam="write",
+               checkdata="write",clean="all"))
+m2 <- do_admb("tadpole",
+             data=c(list(nobs=15),tadpoledat),
+             params=list(c=list(0.45,bounds=c(0,1)),
+                         d=list(13,bounds=c(0,50)),
+                         g=1,bounds=c(-1,25)),
              run.opts=run.control(checkparam="write",
                checkdata="write",clean="all"))
 unlink("tadpole.tpl")
