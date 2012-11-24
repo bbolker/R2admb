@@ -27,7 +27,7 @@
   \item{params}{a named list of starting parameter values
   (order must match TPL file): each element of the list can
   either be a single value, or a list containing elements
-  \itemize{ \item{value}{starting value of the parameter
+  \describe{ \item{value}{starting value of the parameter
   (default 0)} \item{bounds}{two-element vector of lower
   and upper bounds} \item{phase}{integer, specifying phase:
   not implemented yet} }}

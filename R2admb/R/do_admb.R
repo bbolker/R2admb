@@ -21,7 +21,7 @@
 ##' \item{data_type}{character: possible values as in \code{\link{storage.mode}}, typically "integer" or "numeric": this overrides R2admb's attempts to guess whether variables are supposed to be integers or floats (default NA)}
 ##' }
 ##'@param params a named list of starting parameter values (order must match TPL file): each element of the list can either be a single value, or a list containing elements
-##'\itemize{
+##'\describe{
 ##' \item{value}{starting value of the parameter (default 0)}
 ##' \item{bounds}{two-element vector of lower and upper bounds}
 ##' \item{phase}{integer, specifying phase: not implemented yet}
