@@ -176,7 +176,7 @@ read_pars <- function (fn,drop_phase=TRUE) {
         nopar <- readBin(filen, what = "integer", n = 1)
         hes <- readBin(filen, what = "double", n = nopar * nopar)
         hes <- matrix(hes, byrow = TRUE, ncol = nopar)
-        colnames(hes) <- rownames(hes) <- sdparnames
+        colnames(hes) <- rownames(hes) <- sdparnames[seq(ncol(vcov))]
         close(filen)
     }
     ## return npar as number of columns in vcov and npar_total as npar+re
