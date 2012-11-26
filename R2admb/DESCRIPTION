@@ -36,3 +36,4 @@ Collate:
     'write-funs.r'
     'extract_gradient.r'
     'find_large_cor.r'
+    'get_version.r'

@@ -1,3 +1,4 @@
+export(admb_version)
 export(clean_admb)
 export(compile_admb)
 export(dat_write)

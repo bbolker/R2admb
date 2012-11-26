@@ -4,6 +4,12 @@
 \title{R2admb News}
 \encoding{UTF-8}
 
+\section{Changes in DEVELOPMENT VERSION }{
+  \itemize{
+    \item add admb_version()
+  }
+}
+
 \section{Changes in version 0.7.6 (2012-11-06)}{
   \itemize{
     \item Development migration to github
