@@ -259,6 +259,21 @@ read_tpl <- function(f) {
     list(secs=splsec,info=L[sapply(L,nrow)>0])
 }
 
+##'Read in ADMB profile file
+##'
+##'Read in the output from ADMB likelihood profiling stored in a \code{.plt}
+##'file
+##'
+##'@usage read_plt(varname)
+##'@export
+##'@param varname (character) Name of profiled variable (base name of \code{.plot} file)
+##'@return List containing the following elements
+##'     list(prof=prof1,ci=ci1,prof_norm=profnorm,ci_norm=cinorm)
+##' \item{prof}{likelihood profile: a two-column matrix containing the parameter value and the corresponding likelihood (\emph{not} the log-likelihood or negative log-likelihood)
+##' \item{ci}{matrix of upper and lower confidence intervals at the 0.9, 0.95, and 0.975 levels
+##' \item{prof_norm}{likelihood profile based on a normal approximation}
+##' \item{cinorm}{confidence interval matrix based on normal approximation}
+
 read_plt <- function(varname) {
     fn <- paste(varname,"plt",sep=".")
     r <- readLines(fn)
@@ -267,7 +282,7 @@ read_plt <- function(varname) {
     t1 <- textConnection(r[3:(cisecline[1]-1)])
     prof1 <- matrix(scan(t1,quiet=TRUE),ncol=2,
                     byrow=TRUE,
-                    dimnames=list(NULL,c("value","logLik")))
+                    dimnames=list(NULL,c("value","likelihood")))
     close(t1)
     t2 <- textConnection(r[cisecline[1]+(2:4)])
     ci1 <- matrix(scan(t2,quiet=TRUE),ncol=3,
