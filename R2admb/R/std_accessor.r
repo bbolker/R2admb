@@ -147,7 +147,12 @@ coef.admb <- function(object,type=c("par","extra","all"),...) {
 			extra=x[-(1:n)],
 			all=x)
 }
-logLik.admb <- function(object,...) object$loglik
+logLik.admb <- function(object,...) {
+    L <- object$loglik
+    df <- length(coef(object))
+    attr(L,"df") <- df
+    L
+}
 vcov.admb <- function(object,type=c("par","extra","all"),...) {
 	type <- match.arg(type)
 	v <- object$vcov
