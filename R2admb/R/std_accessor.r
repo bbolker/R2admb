@@ -151,6 +151,9 @@ logLik.admb <- function(object,...) {
     L <- object$loglik
     df <- length(coef(object))
     attr(L,"df") <- df
+    class(L) <- "logLik"
+    ## fixme: would be nice to have an "nobs" attribute
+    ##   but not sure when/how it can be defined ...
     L
 }
 vcov.admb <- function(object,type=c("par","extra","all"),...) {
