@@ -131,7 +131,7 @@ m2 <- do_admb("tadpole",
              data=c(list(nobs=15),tadpoledat),
              params=list(c=list(0.45,bounds=c(0,1)),
                          d=list(13,bounds=c(0,50)),
-                         g=1,bounds=c(-1,25)),
+                         g=list(1,bounds=c(-1,25))),
              run.opts=run.control(checkparam="write",
                checkdata="write",clean="all"))
 unlink("tadpole.tpl")

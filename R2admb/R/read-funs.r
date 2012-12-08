@@ -267,12 +267,11 @@ read_tpl <- function(f) {
 ##'@usage read_plt(varname)
 ##'@export
 ##'@param varname (character) Name of profiled variable (base name of \code{.plot} file)
-##'@return List containing the following elements
-##'     list(prof=prof1,ci=ci1,prof_norm=profnorm,ci_norm=cinorm)
-##' \item{prof}{likelihood profile: a two-column matrix containing the parameter value and the corresponding likelihood (\emph{not} the log-likelihood or negative log-likelihood)
-##' \item{ci}{matrix of upper and lower confidence intervals at the 0.9, 0.95, and 0.975 levels
-##' \item{prof_norm}{likelihood profile based on a normal approximation}
-##' \item{cinorm}{confidence interval matrix based on normal approximation}
+##'@return List containing the following elements:
+##' \item{prof}{likelihood profile: a two-column matrix containing the parameter value and the corresponding likelihood (\emph{not} the log-likelihood or negative log-likelihood), scaled to integrate to 1.0}
+##' \item{ci}{matrix of upper and lower confidence intervals at the 0.9, 0.95, and 0.975 levels}
+##' \item{prof_norm}{likelihood profile, based on a normal approximation}
+##' \item{cinorm}{confidence interval matrix, based on normal approximation}
 
 read_plt <- function(varname) {
     fn <- paste(varname,"plt",sep=".")
