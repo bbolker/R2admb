@@ -25,7 +25,7 @@ Collate:
     'R2admb-package.R'
     'base-funs.r'
     'check_section.R'
-    'do_admb.R'
+    'do_admb.r'
     'mcmc.control.r'
     'plot.admb_hist.r'
     'read-funs.r'
