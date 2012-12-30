@@ -193,9 +193,12 @@ read_psv <- function(fn,names=NULL) {
     if (!file.exists(fn)) stop("no PSV file found")
     ans <- read_admbbin(fn)
     if (is.null(names)) names <- paste("V",seq(ncol(ans)),sep="")
-    if (length(names)!=ncol(ans)) {
-        warning("mismatch between number of columns and number of names")
+    if (length(names)<ncol(ans)) {
+        warning("more columns than names: generating dummy names")
         names <- c(names,paste("V",seq(length(names)+1,ncol(ans)),sep=""))
+    } else if (length(names)<ncol(ans)) {
+        warning("more names than columns: truncating names")
+        names <- names[seq(ncol(ans))]
     }
     colnames(ans) <- names
     ans <- as.data.frame(ans)

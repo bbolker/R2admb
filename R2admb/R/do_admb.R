@@ -167,12 +167,30 @@ do_admb <- function(fn,
                     if (valsOK) x else NULL  ## non-list
                 }
             })
-            res[!sapply(res,is.null)]
+            res <- res[!sapply(res,is.null)]
+            if (length(res)==0) res <- NULL
+            res
         }
         if (!checkparam %in% c("write","ignore") && is.null(tplinfo$inits))
             stop("must specify PARAMETER section (or set 'checkparam' to 'write' or 'ignore')")
         if (checkparam!="ignore") {
             if (missing(bounds)) bounds <- getvals(params,"bounds",valsOK=FALSE)
+            if (any(unlist(lapply(params,names))=="re")) {
+                ## replace TRUE with vector length
+                params <- lapply(params,
+                                 function(x) {
+                                     if ("re" %in% names(x)) {
+                                         len <- if ("value" %in% names(x)) {
+                                             length(x[["value"]])
+                                         } else if (names(x)[1]=="") {
+                                             length(x[[1]])
+                                         } else stop("first element must be unnamed or 'value' must be specified")
+                                         x[["re"]] <- len
+                                     }
+                                     x
+                                 })
+            }
+            if (missing(re)) re <- getvals(params,"re",valsOK=FALSE)
             params <- getvals(params,"value",getFirst=TRUE,valsOK=TRUE)
             dmsg <- check_section(ofn,tpldat,"inits",params,
                                   check=checkparam,

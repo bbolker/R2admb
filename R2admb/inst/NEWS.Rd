@@ -7,6 +7,8 @@
 \section{Changes in DEVELOPMENT VERSION }{
   \itemize{
     \item add admb_version()
+    \item fix buglets with MCMC reading
+    \item fix bug to allow re to be specified within parameter lists
   }
 }
 

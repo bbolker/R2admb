@@ -535,8 +535,7 @@ load("toy1_runs.RData")
 @ 
 
 The only changes in the \code{do\_admb} call are that 
-we have to specify \code{re=TRUE} (to turn on random effects) and
-we have to use the \code{re\_vectors}
+we have to use the \code{re}
 argument to specify the names and lengths of each of the random effects vectors --- only one
 (\code{u\_herd}) in this case.
 
