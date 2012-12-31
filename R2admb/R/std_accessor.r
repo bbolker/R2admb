@@ -109,18 +109,16 @@ print.admb <- function(x, verbose=FALSE, ...) {
 }      
 
 summary.admb <- function(object, correlation=FALSE, symbolic.cor = FALSE, ...) {
-	p1 <- 1:length(object$coefficients)
-	coef.p <- unlist(object$coefficients)
-	covmat <- object$vcov
-	var.cf <- diag(covmat)
-	s.err <- sqrt(var.cf)
+        coef.p <- unlist(coef(object,"par"))
+	s.err <- sqrt(diag(vcov(object)))
 	tvalue <- coef.p/s.err
 	dn <- c("Estimate", "Std. Error")
 	pvalue <- 2 * pnorm(-abs(tvalue))
 	coef.table <- cbind(coef.p, s.err, tvalue, pvalue)
 	dimnames(coef.table) <- list(names(coef.p), c(dn, 
 					"z value", "Pr(>|z|)"))
-	ans <- list(coefficients=coef.table,loglik=object$loglik,fn=object$fn)
+	ans <- c(list(coefficients=coef.table),
+                 object[c("loglik","fn","npar")])
 	class(ans) <- "summary.admb"
 	ans
 }
@@ -131,7 +129,8 @@ print.summary.admb <- function(x,
 		signif.stars = getOption("show.signif.stars"), ...) {
 	coefs <- x$coefficients
 	cat("Model file:",x$fn,"\n")
-	cat("Negative log-likelihood:",-x$loglik,"\n")
+	cat("Negative log-likelihood: ",sprintf("%1.1f",-x$loglik),"\t",
+            "AIC: ",sprintf("%.1f",-2*(x$npar+x$loglik)),"\n")
 	cat("Coefficients:\n")
 	printCoefmat(coefs, digits = digits, signif.stars = signif.stars, 
 			na.print = "NA", ...)

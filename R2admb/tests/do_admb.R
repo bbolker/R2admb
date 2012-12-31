@@ -1,4 +1,5 @@
 library(R2admb)
+
 if ((s <- setup_admb())!="") {
     ## run only if we can
     file.copy(system.file("tplfiles","ReedfrogSizepred0.tpl",package="R2admb"),"tadpole.tpl")
@@ -71,4 +72,7 @@ Zherd <- model.matrix(~herd-1,data=cbpp)
                   sigma_herd=list(0.1,bounds=c(0.0001,20))),
               re=list(u_herd=ncol(Zherd)),
               run.opts=run.control(checkdata="write",checkparam="write"))
+
+    summary(d2)
+    unlink("toy1.tpl")
 }
