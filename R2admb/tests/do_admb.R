@@ -14,17 +14,37 @@ if ((s <- setup_admb())!="") {
                   bounds=list(c=c(0,1),d=c(0,50),g=c(-1,25)),
                   run.opts=run.control(checkparam="write",
                   checkdata="write",clean="all"))
+
+    m1P <- do_admb("tadpole",
+                   data=c(list(nobs=15),tadpoledat),
+                   params=par1,
+                   bounds=list(c=c(0,1),d=c(0,50),g=c(-1,25)),
+                   phase=list(c=1,d=2,g=-1),
+                   run.opts=run.control(checkparam="write",
+                   checkdata="write",clean="all"))
+
     par2 <- list(c=list(0.45,bounds=c(0,1)),
                  d=list(13,bounds=c(0,50)),
                  g=list(1,bounds=c(-1,25)))
-    ## getvals(par2)
-    ## getvals(par2,"value",TRUE)
+
     m2 <- do_admb("tadpole",
                   data=c(list(nobs=15),tadpoledat),
                   params=par2,
                   run.opts=run.control(checkparam="write",
                   checkdata="write",clean="all"))
+
+    par2P <- list(c=list(0.45,bounds=c(0,1),phase=1),
+                 d=list(13,bounds=c(0,50),phase=2),
+                 g=list(1,bounds=c(-1,25),phase=-1))
+
+    m2P <- do_admb("tadpole",
+                  data=c(list(nobs=15),tadpoledat),
+                  params=par2P,
+                  run.opts=run.control(checkparam="write",
+                  checkdata="write",clean="all"))
+
     stopifnot(all.equal(m1,m2))
+    stopifnot(all.equal(m1P,m2P))
     unlink("tadpole.tpl")
 
     file.copy(system.file("tplfiles","toy1.tpl",package="R2admb"),"toy1.tpl")
@@ -51,7 +71,7 @@ if ((s <- setup_admb())!="") {
 "size", "period"), row.names = c(NA, 56L), class = "data.frame")
 
     X <- model.matrix(~period,data=cbpp)
-Zherd <- model.matrix(~herd-1,data=cbpp)
+    Zherd <- model.matrix(~herd-1,data=cbpp)
 
     tmpdat <- list(X=X,Zherd=Zherd,
                  incidence=cbpp$incidence,size=cbpp$size,

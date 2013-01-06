@@ -88,7 +88,7 @@ do_admb <- function(fn,
                     data=NULL,
                     params=NULL,
                     bounds=NULL,
-                    phase=NULL,    ## FIXME: implement phases
+                    phase=NULL,
                     re=NULL,
                     data_type=NULL,
                     safe=TRUE,
@@ -175,6 +175,7 @@ do_admb <- function(fn,
             stop("must specify PARAMETER section (or set 'checkparam' to 'write' or 'ignore')")
         if (checkparam!="ignore") {
             if (missing(bounds)) bounds <- getvals(params,"bounds",valsOK=FALSE)
+            if (missing(phase)) phase <- getvals(params,"phase",valsOK=FALSE)
             if (any(unlist(lapply(params,names))=="re")) {
                 ## replace TRUE with vector length
                 params <- lapply(params,
@@ -196,6 +197,7 @@ do_admb <- function(fn,
                                   check=checkparam,
                                   bounds=bounds,
                                   data_type=data_type,
+                                  phase=phase,
                                   secname="PARAMETER",
                                   objfunname=objfunname,
                                   re=re,
