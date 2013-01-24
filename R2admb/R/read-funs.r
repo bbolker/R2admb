@@ -121,15 +121,20 @@ read_pars <- function (fn,drop_phase=TRUE) {
         ## need col.names hack so read.table knows how many
         ##  columns to read: ?read.table, "Details"
         ## FIXME: go gracefully if .cor missing?
-        ncorpar <- length(readLines(paste(fn,"cor",sep=".")))-2
-        cor_dat <- rt(fn,"cor", skip = 2, fill=TRUE, 
-                      as.is=TRUE,col.names=paste("X",1:(4+ncorpar),sep=""))
-        ## drop cors that are not parameters
-        ## (have dropped mc parameters)
-        cormat <- as.matrix(cor_dat[1:nsdpar,4+(1:nsdpar)])
-        cormat[upper.tri(cormat)] <- t(cormat)[upper.tri(cormat)]
-        ## be careful here -- need to adjust for phase<0 parameters,
-        ##  which will be in parameter vector but not in
+        if (file.exists(paste(fn,"cor",sep="."))) {
+            ncorpar <- length(readLines(paste(fn,"cor",sep=".")))-2
+            cor_dat <- rt(fn,"cor", skip = 2, fill=TRUE, 
+                          as.is=TRUE,col.names=paste("X",1:(4+ncorpar),sep=""))
+            ## drop cors that are not parameters
+            ## (have dropped mc parameters)
+            cormat <- as.matrix(cor_dat[1:nsdpar,4+(1:nsdpar)])
+            cormat[upper.tri(cormat)] <- t(cormat)[upper.tri(cormat)]
+            ## be careful here -- need to adjust for phase<0 parameters,
+            ##  which will be in parameter vector but not in
+        } else {
+            warning(".cor file not found")
+            cormat <- NA
+        }
         ##  sd
         sdparnames <- sd_dat[, 2]
         misspars <- setdiff(parnames0,sdparnames)
@@ -159,6 +164,7 @@ read_pars <- function (fn,drop_phase=TRUE) {
         } else {
             ## fall back: less precise, prob. due to ascii text read
             vcov <- cormat*outer(std,std)
+            if (!is.matrix(cormat)) cormat <- vcov ## (missing cor file)
         }
     }
     ##  check if sdparnames is null; jll modified to use ncol(vcov) for vcov
