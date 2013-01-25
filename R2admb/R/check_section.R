@@ -29,6 +29,16 @@ check_section <- function(fn,
             if (length(grep("\\.",tplnames)>1)) {
                 msg <- paste(msg,"dots in parameter/variable names")
             }
+            ## FIXME: attach() throws a NOTE in R CMD check
+            ##  no longer remember what it's doing:
+            ##  figure it out and document, and try to
+            ##   find another way around it ...
+            ## I believe the issue is that we need to try
+            ## to evaluate the various parameter dimensions in
+            ## the context of R_list (see eval(parse(...)) calls
+            ## below), but otherwise allow lookup to fall back
+            ## to the regular search path; there is probably a better
+            ## way to handle this
             attach(R_list,warn.conflicts=FALSE)
             on.exit(detach(R_list),add=TRUE)
             ## now need to check dimensions etc...

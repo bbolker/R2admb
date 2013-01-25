@@ -4,8 +4,18 @@
 \title{R2admb News}
 \encoding{UTF-8}
 
-\section{Changes in DEVELOPMENT VERSION }{
+\section{Changes in version 0.7.999 }{
   \itemize{
+  }
+}
+
+
+\section{Changes in version 0.7.7 (2013-1-24}{
+  \itemize{
+    \item phase support
+    \item add AIC to summary printing method
+    \item read_plt() (likelihood profile info) now user-visible
+    \item warn on missing cor file
     \item add admb_version()
     \item fix buglets with MCMC reading
     \item fix bug to allow re to be specified within parameter lists
