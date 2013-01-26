@@ -12,15 +12,15 @@
 \title{Standard accessor functions for ADMB model fits}
 \usage{
   \method{AIC}{admb}(object,...,k=2)
-    \method{vcov}{admb}(object,type=c("par","extra","all"),...)
+    \method{vcov}{admb}(object,type="fixed",...)
     \method{logLik}{admb}(object,...)
     \method{summary}{admb}(object,correlation=FALSE,symbolic.cor
     = FALSE,...)
-    \method{stdEr}{admb}(object,type=c("par","extra","all"),...)
+    \method{stdEr}{admb}(object,type="fixed",...)
     \method{print}{admb}(x,verbose=FALSE,...)
-    \method{coef}{admb}(object,type=c("par","extra","all"),...)
+    \method{coef}{admb}(object,type="fixed",...)
     \method{confint}{admb}(object, parm, level=0.95,
-    method="default",...)
+    method="default", type="fixed",...)
     \method{deviance}{admb}(object,...)
 }
 \arguments{
@@ -30,9 +30,11 @@
 
   \item{k}{penalty value for AIC fits}
 
-  \item{type}{which type of parameters report. "par":
-  parameters only; "extra": sdreport variables; "all":
-  both}
+  \item{type}{which type of parameters to report. Character
+  vector, including one or more of "fixed" (standard,
+  fixed-effect parameters); "random" (random effect
+  parameters); "extra" (report/sdreport variables); "all"
+  (all of the above). sdreport variables; "all": both}
 
   \item{parm}{(currently ignored: FIXME) select parameters}
 

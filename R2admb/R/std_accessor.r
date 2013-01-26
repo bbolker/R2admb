@@ -5,13 +5,13 @@
 #'
 #'
 #' @usage \method{AIC}{admb}(object,...,k=2)
-#'           \method{vcov}{admb}(object,type=c("par","extra","all"),...)
+#'           \method{vcov}{admb}(object,type="fixed",...)
 #'           \method{logLik}{admb}(object,...)
 #'           \method{summary}{admb}(object,correlation=FALSE,symbolic.cor = FALSE,...)
-#'           \method{stdEr}{admb}(object,type=c("par","extra","all"),...)
+#'           \method{stdEr}{admb}(object,type="fixed",...)
 #'           \method{print}{admb}(x,verbose=FALSE,...)
-#'           \method{coef}{admb}(object,type=c("par","extra","all"),...)
-#'           \method{confint}{admb}(object, parm, level=0.95, method="default",...)
+#'           \method{coef}{admb}(object,type="fixed",...)
+#'           \method{confint}{admb}(object, parm, level=0.95, method="default", type="fixed",...)
 #'           \method{deviance}{admb}(object,...)
 #' @S3method print admb
 #' @S3method print summary.admb
@@ -29,7 +29,7 @@
 #'@param x an ADMB model fit (of class "admb")
 #'@param object an ADMB model fit (of class "admb")
 #'@param k penalty value for AIC fits
-#'@param type which type of parameters report. "par": parameters only; "extra":
+#'@param type which type of parameters to report. Character vector, including one or more of "fixed" (standard, fixed-effect parameters); "random" (random effect parameters); "extra" (report/sdreport variables); "all" (all of the above).
 #'sdreport variables; "all": both
 #'@param parm (currently ignored: FIXME) select parameters
 #'@param level alpha level for confidence interval
@@ -64,33 +64,52 @@ AIC.admb <- function(object,...,k=2) {
 	if (length(list(...))>0) stop("multi-object AIC not yet implemented")
 	deviance(object)+k*length(coef(object))
 }
-## confint.default works
-confint.admb <- function(object, parm, level=0.95, method="default", ...) {
-	if (method %in% c("default","quad")) {
-		tab <- confint.default(object)
-	} else if (method=="profile") {
-		vals <- object[["prof"]]
-		if (is.null(vals)) stop("model not fitted with profile=TRUE")
-		if (!level %in% c(0.9,0.95,975)) stop("arbitrary levels not yet implemented:",
-					"level must be in (0.9,0.95,0.975)")
-		tab <- t(sapply(vals,function(x) {
-							x$ci[x$ci[,"sig"]==level,c("lower","upper")]
-						}))
-		colnames(tab) <- paste(c((1-level)/2,(1+level)/2)*100,"%")
-		tab
-	} else if (method %in% c("quantile","HPDinterval")) {
-		vals <- object[["mcmc"]]
-		if (is.null(vals)) stop("model not fitted with mcmc=TRUE")
-		if (method=="quantile") {
-			tab <- t(apply(vals,2,quantile,c((1-level)/2,(1+level)/2)))
-		} else {
-			require(coda)
-			tab <- HPDinterval(as.mcmc(vals))
-			colnames(tab) <- paste(c((1-level)/2,(1+level)/2)*100,"%")
-		}
-	}
-	tab
+
+## copied from stats::
+format.perc <- function (probs, digits)  {
+    paste(format(100 * probs, trim = TRUE, scientific = FALSE, digits = digits), 
+          "%")
 }
+
+## confint.default works
+confint.admb <- function(object, parm, level=0.95, method="default", type="fixed", ...) {
+    if (method %in% c("default","quad")) {
+        ## copied from confint.default because we want to keep the *default* type
+        ## for vcov() equal to "fixed", and can't pass options through confint.default()
+        ## as long as we're at it we should use $se rather than sqrt(diag(vcov))
+        cf <- coef(object,type="all")
+        a <- (1 - level)/2
+        a <- c(a, 1 - a)
+        pct <- format.perc(a, 3)
+        fac <- qnorm(a)
+        ci <- array(NA, dim = c(length(cf), 2L), dimnames = list(names(cf),pct))
+        ses <- object$se
+        ci[] <- cf + ses %o% fac
+        tab <- ci[get_parn(object,type),]
+    } else if (method=="profile") {
+        vals <- object[["prof"]]
+        if (is.null(vals)) stop("model not fitted with profile=TRUE")
+        if (!level %in% c(0.9,0.95,975)) stop("arbitrary levels not yet implemented:",
+                                              "level must be in (0.9,0.95,0.975)")
+        tab <- t(sapply(vals,function(x) {
+            x$ci[x$ci[,"sig"]==level,c("lower","upper")]
+        }))
+        colnames(tab) <- paste(c((1-level)/2,(1+level)/2)*100,"%")
+    } else if (method %in% c("quantile","HPDinterval")) {
+        vals <- object[["mcmc"]]
+        if (is.null(vals)) stop("model not fitted with mcmc=TRUE")
+        if (method=="quantile") {
+            tab <- t(apply(vals,2,quantile,c((1-level)/2,(1+level)/2)))
+        } else {
+            require(coda)
+            tab <- HPDinterval(as.mcmc(vals))
+            colnames(tab) <- paste(c((1-level)/2,(1+level)/2)*100,"%")
+        }
+    }
+    if (missing(parm)) parm <- seq(nrow(tab))
+    tab[parm,,drop=FALSE]
+}
+
 print.admb <- function(x, verbose=FALSE, ...) {
 	cat("Model file:",x$fn,"\n")
 	if (is.null(x$loglik)) {
@@ -136,16 +155,25 @@ print.summary.admb <- function(x,
 			na.print = "NA", ...)
 }
 
-
-coef.admb <- function(object,type=c("par","extra","all"),...) {
-	type <- match.arg(type)
-	x <- object$coefficients
-	n <- object$npar
-	if (is.null(n)) n <- length(x)
-	switch(type,par=x[1:n],
-			extra=x[-(1:n)],
-			all=x)
+## utility function: get positions in parameter vector matching various types
+get_parn <- function(x,type=c("par","fixed","random","extra","all")) {
+    type <- match.arg(type)
+    ## "par" and "fixed": synonyms
+    if (type=="all") return(seq(x$npar_total))
+    type[type=="par"] <- "fixed"
+    w <- numeric(0)
+    sseq <- function(n) if (n==0) numeric(0) else seq(n)
+    if ("fixed" %in% type) w <-c(w,sseq(x$npar))
+    if ("random" %in% type) w <- c(w,x$npar+sseq(x$npar_re))
+    if ("extra" %in% type) w <- c(w,x$npar+x$npar_re+sseq(x$npar_extra))
+    w
 }
+    
+
+coef.admb <- function(object,type="fixed",...) {
+    object$coefficients[get_parn(object,type)]
+}
+
 logLik.admb <- function(object,...) {
     L <- object$loglik
     df <- length(coef(object))
@@ -155,26 +183,19 @@ logLik.admb <- function(object,...) {
     ##   but not sure when/how it can be defined ...
     L
 }
-vcov.admb <- function(object,type=c("par","extra","all"),...) {
-	type <- match.arg(type)
-	v <- object$vcov
-	n <- object$npar
-	if (is.null(n)) n <- ncol(v)
-	switch(type,par=v[1:n,1:n,drop=FALSE],
-			extra=v[-(1:n),-(1:n),drop=FALSE],
-			all=v)
+vcov.admb <- function(object,type="fixed",...) {
+    v <- object$vcov
+    w <- get_parn(object,type)
+    v[w,w,drop=FALSE]
 }
 
 stdEr <- function(object, ...) {
-	UseMethod("stdEr")
+    UseMethod("stdEr")
 }
-stdEr.admb <- function(object,type=c("par","extra","all"),...) {
-	type <- match.arg(type)  
-	s <- sqrt(diag(object$vcov))
-	n <- object$npar
-	switch(type,par=s[1:n],
-			extra=s[-(1:n)],
-			all=s)
+
+stdEr.admb <- function(object,type="fixed",...) {
+    s <- sqrt(diag(object$vcov))
+    object$se[get_parn(object,type)]
 }
 
 deviance.admb <- function(object,...) -2*object$loglik

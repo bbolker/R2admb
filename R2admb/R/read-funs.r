@@ -156,17 +156,19 @@ read_pars <- function (fn,drop_phase=TRUE) {
         sdrptvals <- sd_dat[-(1:npar3),3]
         sdrptnams <- sd_dat[-(1:npar3),2]
         names(sdrptvals) <- sdrptnams
+        ## less accurate, but available for all parameters (RE, extra)
+        vcov <- cormat*outer(std,std)
+        if (!is.matrix(cormat)) cormat <- vcov ## (missing cor file)
         if(file.exists("admodel.cov"))
         {
+            ## more accurate, binary info
             filen <- file("admodel.cov", "rb")
             nopar <- readBin(filen, what = "integer", n = 1)
-            vcov <- readBin(filen, what = "double", n = nopar * nopar)
-            vcov <- matrix(vcov, byrow = TRUE, ncol = nopar)
+            vcov2 <- readBin(filen, what = "double", n = nopar * nopar)
+            vcov2 <- matrix(vcov2, byrow = TRUE, ncol = nopar)
             close(filen)
-        } else {
-            ## fall back: less precise, prob. due to ascii text read
-            vcov <- cormat*outer(std,std)
-            if (!is.matrix(cormat)) cormat <- vcov ## (missing cor file)
+            ## replace vcov[] with better values
+            vcov[1:nopar,1:nopar] <- vcov2
         }
     }
     ##  check if sdparnames is null; jll modified to use ncol(vcov) for vcov
@@ -192,7 +194,11 @@ read_pars <- function (fn,drop_phase=TRUE) {
     list(coefficients=c(est,sdrptvals),
          coeflist=parlist,
          se=std, loglik=-loglik, maxgrad=-maxgrad, cor=cormat, vcov=vcov,
-         npar=nopar,npar_total=npar,hes=hes)
+         npar=nopar,           ## fixed-effect
+         npar_re=npar-nopar,   ## random-effect
+         npar_extra=length(sdrptvals),  ## sdreport/report
+         npar_total=length(est)+length(sdrptvals), ## all
+         hes=hes)
 }
 
 read_psv <- function(fn,names=NULL) {

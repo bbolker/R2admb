@@ -12,6 +12,8 @@
 
 \section{Changes in version 0.7.7 (2013-1-24}{
   \itemize{
+    \item improved handling of variable types (fixed, random, extra) in
+  accessors (coef, confint, stdEr)
     \item phase support
     \item add AIC to summary printing method
     \item read_plt() (likelihood profile info) now user-visible
