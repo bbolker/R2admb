@@ -1,0 +1,29 @@
+setwd("~/R/pkgs/R2admb/R2admb")
+library(devtools)
+load_all(".")
+check()
+setwd("~/R/misc")
+library("R2admb")
+skatestuff <- load("skateJan25.RData")
+dim(tfit_admb$vcov)   ## 28 x 28
+tfit_admb$npar_total  ## 133 (?? includes RE but not extras)
+length(coef(tfit_admb))
+length(coef(tfit_admb,"extra")) ## 316
+length(coef(tfit_admb,"all"))   ## 344 ???
+length(tfit_admb$se)  ## 344
+
+lapply(tfit_admb,function(x) if (is.matrix(x)) dim(x) else length(x))
+## coefficients includes all
+## coeflist includes fixed, random, NOT extra
+## cor includes ALL
+## vcov includes only fixed: from admodel.cov
+
+## 
+## admodel.cov  binary variance-covariance matrix (fixed parameters only)
+## admodel.hes  binary hessian matrix
+## *.dat
+## *.par
+## *.std
+## *.rep
+## *.bar        binary
+## *.psv        binary MCMC output
