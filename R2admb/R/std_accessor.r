@@ -73,6 +73,14 @@ format.perc <- function (probs, digits)  {
 
 ## confint.default works
 confint.admb <- function(object, parm, level=0.95, method="default", type="fixed", ...) {
+    if (!missing(parm) && is.character(parm)) {
+        ## try to catch mistakes like specifying method or type in parm slot
+        if (any(is.na(m <- match(parm,names(coef(object,"all")))))) {
+            missparms <- parm[is.na(m)]
+            stop("requested parameters missing from parameter vector: ",
+                 paste(missparms,collapse=", "))
+        }
+    }
     if (method %in% c("default","quad")) {
         ## copied from confint.default because we want to keep the *default* type
         ## for vcov() equal to "fixed", and can't pass options through confint.default()
