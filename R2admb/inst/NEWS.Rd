@@ -10,7 +10,7 @@
 }
 
 
-\section{Changes in version 0.7.7 (2013-1-24}{
+\section{Changes in version 0.7.7 (2013-2-07}{
   \itemize{
     \item improved handling of variable types (fixed, random, extra) in
   accessors (coef, confint, stdEr)
@@ -21,6 +21,8 @@
     \item add admb_version()
     \item fix buglets with MCMC reading
     \item fix bug to allow re to be specified within parameter lists
+    \item more flexibility in extracting coefficients, var-cov elements
+    \item 
   }
 }
 

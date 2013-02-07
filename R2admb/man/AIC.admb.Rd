@@ -5,23 +5,39 @@
 \alias{deviance.admb}
 \alias{logLik.admb}
 \alias{print.admb}
+\alias{print.summary.admb}
 \alias{stdEr}
 \alias{stdEr.admb}
 \alias{summary.admb}
 \alias{vcov.admb}
 \title{Standard accessor functions for ADMB model fits}
 \usage{
-  \method{AIC}{admb}(object,...,k=2)
-    \method{vcov}{admb}(object,type="fixed",...)
-    \method{logLik}{admb}(object,...)
-    \method{summary}{admb}(object,correlation=FALSE,symbolic.cor
-    = FALSE,...)
-    \method{stdEr}{admb}(object,type="fixed",...)
-    \method{print}{admb}(x,verbose=FALSE,...)
-    \method{coef}{admb}(object,type="fixed",...)
-    \method{confint}{admb}(object, parm, level=0.95,
-    method="default", type="fixed",...)
-    \method{deviance}{admb}(object,...)
+  \method{AIC}{admb} (object, ..., k = 2)
+
+  \method{confint}{admb} (object, parm, level = 0.95,
+    method = "default", type = "fixed", ...)
+
+  \method{print}{admb} (x, verbose = FALSE, ...)
+
+  \method{summary}{admb} (object, correlation = FALSE,
+    symbolic.cor = FALSE, ...)
+
+  \method{print}{summary.admb} (x,
+    digits = max(3, getOption("digits") - 3),
+    symbolic.cor = x$symbolic.cor,
+    signif.stars = getOption("show.signif.stars"), ...)
+
+  \method{logLik}{admb} (object, ...)
+
+  \method{coef}{admb} (object, type = "fixed", ...)
+
+  \method{vcov}{admb} (object, type = "fixed", ...)
+
+  stdEr(object, ...)
+
+  \method{stdEr}{admb} (object, type = "fixed", ...)
+
+  \method{deviance}{admb} (object, ...)
 }
 \arguments{
   \item{x}{an ADMB model fit (of class "admb")}
@@ -31,10 +47,11 @@
   \item{k}{penalty value for AIC fits}
 
   \item{type}{which type of parameters to report. Character
-  vector, including one or more of "fixed" (standard,
-  fixed-effect parameters); "random" (random effect
-  parameters); "extra" (report/sdreport variables); "all"
-  (all of the above). sdreport variables; "all": both}
+  vector, including one or more of "fixed" or "par"
+  (standard, fixed-effect parameters); "random" (random
+  effect parameters); "rep" (report variables); "sdrpt"
+  (sdreport variables); "extra" (report and sdreport);
+  "all" (all of the above).}
 
   \item{parm}{(currently ignored: FIXME) select parameters}
 
@@ -55,6 +72,10 @@
 
   \item{\dots}{other parameters (for S3 generic
   compatibility)}
+
+  \item{digits}{number of digits to display}
+
+  \item{signif.stars}{show significance stars?}
 }
 \value{
   Extracts appropriate values: numeric (scalar) for AIC,

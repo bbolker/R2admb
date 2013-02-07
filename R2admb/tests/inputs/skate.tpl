@@ -137,7 +137,7 @@ FUNCTION calculate_objective_func
 GLOBALS_SECTION
 	#include <statslib/statsLib.h> // '#' preprocess command - put this in before compiling starts
 	#undef REPORT
-	#define REPORT(object) report << #object "\n" << object << endl;
+	#define REPORT(object) report << "#" #object "\n" << object << endl;
 	
 REPORT_SECTION
 	REPORT(q);

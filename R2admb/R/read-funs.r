@@ -6,49 +6,37 @@
 ##'
 ##'Given the output from an ADMB run on FOO.tpl, \code{read_pars} reads the
 ##'files FOO.par (parameters, log-likelihood, max gradient); FOO.std (standard
-##'deviations); FOO.cor (correlations); admodel.hes for hessian; and admodel.cov for
-##'covariance matrix  \code{read_psv} reads the output of MCMC runs
+##'deviations); FOO.cor (correlations); FOO.rep (report variables);
+##'admodel.hes for hessian; and admodel.cov for
+##'covariance matrix.  \code{read_psv} reads the output of MCMC runs
 ##'
-##'@usage read_pars(fn,drop_phase=TRUE)
-##'   
-##'       read_psv(fn,names=NULL)
-##'@aliases read_psv read_pars
-##'@export read_psv read_pars
+##'@rdname read_pars
 ##'@param fn (character) Base name of AD Model Builder
-##'@param names (character) Names of variables
 ##'@param drop_phase (logical) drop negative-phase (fixed) parameters from results?
 ##'@return List containing the following elements
 ##' \itemize{
-##' \item{"coefficients"}{parameter estimates}
-##' \item{"coeflist"}{parameter estimates in list format, with proper shape (vectors, matrices, etc.)}
-##' \item{"se"}{estimated standard errors of coefficients}
-##' \item{"loglik"}{log-likelihood}
-##' \item{"maxgrad"}{maximum gradient of log-likelihood surface}
-##' \item{"cor"}{correlation matrix}
-##' \item{"vcov"}{variance-covariance matrix}
-##' \item{"npar"}{number of parameters}
-##' \item{"hes"}{hessian matrix (only if no vcov matrix)}
+##' \item{coefficients}{parameter estimates}
+##' \item{coeflist}{parameter estimates in list format, with proper shape (vectors, matrices, etc.)}
+##' \item{se}{estimated standard errors of coefficients}
+##' \item{loglik}{log-likelihood}
+##' \item{maxgrad}{maximum gradient of log-likelihood surface}
+##' \item{cor}{correlation matrix}
+##' \item{vcov}{variance-covariance matrix}
+##' \item{npar}{number of parameters}
+##' \item{hes}{hessian matrix (only if no vcov matrix)}
 ##' }
 ##'@section Warning: The \code{coeflist} component is untested for data
 ##'structures more complicated than scalars, vectors or matrices (i.e. higher-dimensional or ragged arrays)
 ##'@author Ben Bolker
 ##'@seealso \code{\link{write_pin}}, \code{\link{write_dat}}
 ##'@keywords misc
+##'@export read_pars
+
 read_pars <- function (fn,drop_phase=TRUE) {
     ## see
     ##  http://admb-project.org/community/admb-meeting-march-29-31/InterfacingADMBwithR.pdf
     ## for an alternate file reader -- does this have equivalent functionality?
     ## FIXME: get hessian.bin ?
-    rt <- function(f,ext,...) {
-        fn <- paste(f,ext,sep=".")
-        if (file.exists(fn)) read.table(fn,...) else NA
-    }
-    rs <- function(f,ext,comment.char="#",...) {
-        fn <- paste(f,ext,sep=".")
-        if (file.exists(fn)) scan(fn,
-                                  comment.char=comment.char,
-                                  quiet=TRUE,...) else NA
-    }
     ## get parameter estimates
     par_dat <- rs(fn,"par", skip = 1)
     tmp <- rs(fn, "par", what = "", comment.char="")
@@ -58,52 +46,12 @@ read_pars <- function (fn,drop_phase=TRUE) {
     loglik <- as.numeric(tmp[11])
     maxgrad <- as.numeric(tmp[16])
     ## second pass to extract names from par file (ugh)
-    tmp2 <- readLines(paste(fn,".par",sep=""))
-    parlines <- grep("^#",tmp2)[-1]
-    npar <- length(par_dat)      ## TOTAL number of numeric values
-    npar2 <- length(parlines)  ## number of distinct parameters
-    parlen <- count.fields(paste(fn,".par",sep=""))
-    parlen2 <- count.fields(paste(fn,".par",sep=""),comment.char="")
-    parnames0 <- parnames <- gsub("^# +","",gsub(":$","",tmp2[parlines]))
-    parlist <- vector("list",npar2)
-    parnameslist <- vector("list",npar2)
-    names(parlist) <- parnames
-    cumpar <- 1
-    cumline <- 1
-    ## browser()
-    pp <- c(parlines,length(tmp2)+1)
-    ## reshape parameters properly
-    parid <- numeric(npar2)
-    for (i in seq(npar2)) {
-        nrows <- diff(pp)[i]-1
-        curlines <- cumline:(cumline+nrows-1)
-        curlen <- sum(parlen[curlines])
-        parvals <- par_dat[cumpar:(cumpar+curlen-1)]
-                                        #    if (nrows==1) {
-        if (curlen==1) {
-            parnameslist[[i]] <- parnames[i]
-        } else {
-            parnameslist[[i]] <- numfmt(parnames[i],curlen)
-        }
-        parlist[[i]] <- parvals
-                                        #    } else {
-                                        #      parlist[[i]] <- matrix(parvals,nrow=nrows,byrow=TRUE)
-                                        #      parnameslist[[i]] <- numfmt2(parnames[i],dim(parlist[[i]]))
-                                        #    }
-        ## cat(parnames[i],cumline,cumline+nrows-1,cumpar,cumpar+curlen-1,parnameslist[[i]],"\n")
-        ## print(parlist[[i]])
-        cumline <- cumline + nrows
-        cumpar <- cumpar + curlen
-    }
-    ## FIXME: watch out, 'short param names' has now been overwritten by 'long param names'
-    parnames <- unlist(parnameslist)
-    
-    ## parnames <- unname(unlist(mapply(function(x,len) {
-    ## if (len==1) x else numfmt(x,len)  ## paste(x,1:len,sep=".")
-    ##},
-    ## parnames,parlen)))
-    est <- unlist(par_dat)
-    names(est) <- parnames
+    pars <- read_pars0(paste(fn,"par",sep="."),par_dat)
+    ## FIXME: refactor
+    est <- pars$est
+    parlist <- pars$parlist
+    parnames0 <- pars$parnames0
+    parnameslist <- pars$parnameslist
     if (!is.finite(loglik))
         warning("bad log-likelihood: fitting problem in ADMB?")
     nopar <- NULL ## in case nopar wasn't read from vcov
@@ -189,18 +137,92 @@ read_pars <- function (fn,drop_phase=TRUE) {
         colnames(hes) <- rownames(hes) <- sdparnames[seq(ncol(vcov))]
         close(filen)
     }
+    reportfile <- paste(fn,"rep",sep=".")
+    repvals <- list()
+    if (file.exists(reportfile)) {
+        repvals <- read_rep(fn)
+    }
+    npar_rep <- length(repvals$est)
     ## return npar as number of columns in vcov and npar_total as npar+re
     if (is.null(nopar)) nopar <- npar
-    list(coefficients=c(est,sdrptvals),
-         coeflist=parlist,
+    list(coefficients=c(est,sdrptvals,repvals$est),
+         coeflist=c(parlist,repvals$parlist),
          se=std, loglik=-loglik, maxgrad=-maxgrad, cor=cormat, vcov=vcov,
          npar=nopar,           ## fixed-effect
          npar_re=npar-nopar,   ## random-effect
-         npar_extra=length(sdrptvals),  ## sdreport/report
-         npar_total=length(est)+length(sdrptvals), ## all
+         npar_sdrpt=length(sdrptvals), ## sdreport
+         npar_rep=npar_rep,     ## report
+         npar_total=length(est)+length(sdrptvals)+npar_rep, ## all
          hes=hes)
 }
 
+rt <- function(f,ext,...) {
+    fn <- paste(f,ext,sep=".")
+    if (file.exists(fn)) read.table(fn,...) else NA
+}
+
+rs <- function(f,ext,comment.char="#",...) {
+    fn <- paste(f,ext,sep=".")
+    if (file.exists(fn)) scan(fn,
+                              comment.char=comment.char,
+                              quiet=TRUE,...) else NA
+}
+
+
+## FIXME: can I refactor slightly so I don't need to pass par_dat, or read twice?
+read_pars0 <- function(fnext,par_dat,skip=1) {
+    tmp2 <- readLines(fnext)
+    if (skip>0) tmp2 <- tmp2[-(1:skip)]
+    parlines <- grep("^#",tmp2)
+    npar <- length(par_dat)      ## TOTAL number of numeric values
+    npar2 <- length(parlines)  ## number of distinct parameters
+    parlen <- count.fields(fnext,skip=skip)
+    parlen2 <- count.fields(fnext,comment.char="",skip=skip)
+    parnames0 <- parnames <- gsub("^# +","",gsub(":$","",tmp2[parlines]))
+    parlist <- vector("list",npar2)
+    parnameslist <- vector("list",npar2)
+    names(parlist) <- parnames
+    cumpar <- 1
+    cumline <- 1
+    pp <- c(parlines,length(tmp2)+1)
+    ## reshape parameters properly
+    parid <- numeric(npar2)
+    for (i in seq(npar2)) {
+        nrows <- diff(pp)[i]-1
+        curlines <- cumline:(cumline+nrows-1)
+        curlen <- sum(parlen[curlines])
+        parvals <- par_dat[cumpar:(cumpar+curlen-1)]
+                                        #    if (nrows==1) {
+        if (curlen==1) {
+            parnameslist[[i]] <- parnames[i]
+        } else {
+            parnameslist[[i]] <- numfmt(parnames[i],curlen)
+        }
+        parlist[[i]] <- parvals
+                                        #    } else {
+                                        #      parlist[[i]] <- matrix(parvals,nrow=nrows,byrow=TRUE)
+                                        #      parnameslist[[i]] <- numfmt2(parnames[i],dim(parlist[[i]]))
+                                        #    }
+        ## cat(parnames[i],cumline,cumline+nrows-1,cumpar,cumpar+curlen-1,parnameslist[[i]],"\n")
+        ## print(parlist[[i]])
+        cumline <- cumline + nrows
+        cumpar <- cumpar + curlen
+    }
+    ## FIXME: watch out, 'short param names' has now been overwritten by 'long param names'
+    parnames <- unlist(parnameslist)
+    
+    ## parnames <- unname(unlist(mapply(function(x,len) {
+    ## if (len==1) x else numfmt(x,len)  ## paste(x,1:len,sep=".")
+    ##},
+    ## parnames,parlen)))
+    est <- unlist(par_dat)
+    names(est) <- parnames
+    return(list(est=est,parlist=parlist,parnames0=parnames0,parnameslist=parnameslist))
+}
+
+##'@rdname read_pars
+##'@export read_psv
+##'@param names (character) Names of variables
 read_psv <- function(fn,names=NULL) {
     fn <- tolower(fn) ## arghv
     fn <- paste(fn,"psv",sep=".")
@@ -220,6 +242,18 @@ read_psv <- function(fn,names=NULL) {
 }
 
 
+##'@rdname read_pars
+##'@export read_rep
+read_rep <- function(fn,names=NULL) {
+    fn <- tolower(fn)
+    fnx <- paste(fn,"rep",sep=".")
+    ## check format!
+    rr <- readLines(fnx)
+    if (!all(grepl("^#",rr) | grepl("^[0-9. e]",rr))) stop("report file in non-standard format")
+    par_dat <- rs(fn,"rep")
+    if (!file.exists(fnx)) stop("no REP file found")
+    read_pars0(fnx,par_dat,skip=0)
+}
 
 read_tpl <- function(f) {
     r <- readLines(paste(f,"tpl",sep="."))
