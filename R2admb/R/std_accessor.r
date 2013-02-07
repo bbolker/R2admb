@@ -172,9 +172,9 @@ get_parn <- function(x,type=c("par","fixed","random","extra","sdrpt","rep","all"
     sseq <- function(n) if (n==0) numeric(0) else seq(n)
     if ("fixed" %in% type) w <-c(w,sseq(x$npar))
     if ("random" %in% type) w <- c(w,x$npar+sseq(x$npar_re))
-    if ("sdrpt" %in% type) w <- c(w,x$npar+sseq(x$npar_sdrpt))
-    if ("rep" %in% type) w <- c(w,x$npar+sseq(x$npar_rep))
-    if ("extra" %in% type) w <- c(w,x$npar+x$npar_re+sseq(x$npar_sdrpt)+sseq(x$npar_rep))
+    if ("sdrpt" %in% type) w <- c(w,x$npar+x$npar_re+sseq(x$npar_sdrpt))
+    if ("rep" %in% type) w <- c(w,x$npar+x$npar_re+x$npar_sdrpt+sseq(x$npar_rep))
+    if ("extra" %in% type) w <- c(w,x$npar+x$npar_re+sseq(x$npar_sdrpt+x$npar_rep))
     w
 }
     

@@ -102,8 +102,8 @@ read_pars <- function (fn,drop_phase=TRUE) {
         }
         std <- sd_dat[, 4]
         sdrptvals <- sd_dat[-(1:npar3),3]
-        sdrptnams <- sd_dat[-(1:npar3),2]
-        names(sdrptvals) <- sdrptnams
+        sdrptnames <- sd_dat[-(1:npar3),2]
+        names(sdrptvals) <- sdrptnames
         ## less accurate, but available for all parameters (RE, extra)
         vcov <- cormat*outer(std,std)
         if (!is.matrix(cormat)) cormat <- vcov ## (missing cor file)
