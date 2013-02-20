@@ -209,12 +209,15 @@ proc_var <- function(s,drop.first=TRUE,maxlen) {
 }
 
 drop_calcs <- function(s) {
-  startcalc <- grep("^ *LOC_CALCS",s)
+  startcalc <- grep("^ *LOC(AL)*_CALCS",s)
   endcalc <- grep("^ *END_CALCS",s)
-  if (length(endcalc)==0) endcalc <- length(s)
-  if (length(startcalc)>0) {
-    s <- s[-(startcalc:endcalc)]
+  ## calc may be ended by next section
+  droplines <- numeric(0)
+  for (i in seq_along(startcalc)) {
+      if (length(endcalc)<i) endcalc[i] <- length(s)
+      droplines <- c(droplines,startcalc[i]:endcalc[i])
   }
+  if (length(droplines)>0) s <- s[-droplines]
   commcalc <- grep("^ +!!",s)
   if (length(commcalc)>0) s <- s[-commcalc]
   s

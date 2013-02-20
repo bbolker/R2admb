@@ -1,4 +1,4 @@
-library(R2admb)
+library("R2admb")
 type <- "tpl"
 if (FALSE) {
     ## grab relevant files from ADMB tree
@@ -19,5 +19,5 @@ check_all <- function(type,skipfiles=NULL,fun) {
     }
 }
 
-check_all("tpl",skipfiles="glmmadmb",fun=R2admb:::read_tpl)
+check_all("tpl",fun=R2admb:::read_tpl)
 check_all("par",fun=read_pars)
