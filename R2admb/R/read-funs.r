@@ -33,7 +33,7 @@
 ##'@export read_pars
 
 read_pars <- function (fn,drop_phase=TRUE) {
-    ## see
+    ## seeN
     ##  http://admb-project.org/community/admb-meeting-march-29-31/InterfacingADMBwithR.pdf
     ## for an alternate file reader -- does this have equivalent functionality?
     ## FIXME: get hessian.bin ?
@@ -140,7 +140,9 @@ read_pars <- function (fn,drop_phase=TRUE) {
     reportfile <- paste(fn,"rep",sep=".")
     repvals <- list()
     if (file.exists(reportfile)) {
-        repvals <- read_rep(fn)
+        if (file.info(reportfile)$size > 0){
+            repvals <- read_rep(fn)
+        }
     }
     npar_rep <- length(repvals$est)
     ## return npar as number of columns in vcov and npar_total as npar+re
