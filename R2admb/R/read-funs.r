@@ -141,7 +141,9 @@ read_pars <- function (fn,drop_phase=TRUE) {
     reportfile <- paste(fn,"rep",sep=".")
     repvals <- list()
     if (file.exists(reportfile)) {
-        repvals <- read_rep(fn)
+        if (file.info(reportfile)$size > 0){
+            repvals <- read_rep(fn)
+        }
     }
     npar_rep <- length(repvals$est)
     ## return npar as number of columns in vcov and npar_total as npar+re
