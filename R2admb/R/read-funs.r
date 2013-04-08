@@ -33,7 +33,7 @@
 ##'@export read_pars
 
 read_pars <- function (fn,drop_phase=TRUE) {
-    ## seeN
+    ## see
     ##  http://admb-project.org/community/admb-meeting-march-29-31/InterfacingADMBwithR.pdf
     ## for an alternate file reader -- does this have equivalent functionality?
     ## FIXME: get hessian.bin ?
