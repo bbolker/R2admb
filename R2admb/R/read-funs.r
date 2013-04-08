@@ -60,6 +60,7 @@ read_pars <- function (fn,drop_phase=TRUE) {
     sd_dat <- rt(fn,"std", skip = 1,as.is=TRUE)
     if (length(sd_dat)==1 && is.na(sd_dat)) {
         warning("std file missing: some problem with fit, but retrieving parameter estimates anyway")
+        npar <- length(pars)
         cormat <- vcov <- matrix(NA,nrow=npar,ncol=npar)
         std <- rep(NA,npar)
         sdrptvals <- numeric(0)
