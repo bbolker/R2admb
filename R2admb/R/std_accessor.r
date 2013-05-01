@@ -42,6 +42,7 @@
 ##'  vcov(m1)
 ##'  logLik(m1)
 ##'  deviance(m1)
+##'  stdEr(m1)
 ##'
 AIC.admb <- function(object,...,k=2) {
 	if (length(list(...))>0) stop("multi-object AIC not yet implemented")

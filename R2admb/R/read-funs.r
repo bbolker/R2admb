@@ -110,11 +110,16 @@ read_pars <- function (fn,drop_phase=TRUE) {
         if (!is.matrix(cormat)) cormat <- vcov ## (missing cor file)
         if(file.exists("admodel.cov"))
         {
+            ## see also:
+            ## http://www.admb-project.org/examples/admb-tricks/covariance-calculations/r-code-to-interact-with-admodel.cov/view
             ## more accurate, binary info
             filen <- file("admodel.cov", "rb")
             nopar <- readBin(filen, what = "integer", n = 1)
             vcov2 <- readBin(filen, what = "double", n = nopar * nopar)
-            vcov2 <- matrix(vcov2, byrow = TRUE, ncol = nopar)
+            hybrid_bounded_flag <- readBin(filen, "integer", 1)
+            scale <- readBin(filen, "numeric", nopar)
+            vcov2 <- matrix(vcov2, byrow = TRUE, ncol = nopar) *
+                (scale %o% scale)
             close(filen)
             ## replace vcov[] with better values
             vcov[1:nopar,1:nopar] <- vcov2

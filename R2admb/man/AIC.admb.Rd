@@ -97,6 +97,7 @@ admbex <- system.file("doc","Reedfrog_runs.RData",package="R2admb")
  vcov(m1)
  logLik(m1)
  deviance(m1)
+ stdEr(m1)
 }
 \author{
   Ben Bolker
