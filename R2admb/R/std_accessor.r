@@ -216,6 +216,7 @@ stdEr <- function(object, ...) {
 
 ##' @rdname AIC.admb
 ##' @method stdEr admb
+##' @S3method stdEr admb
 stdEr.admb <- function(object,type="fixed",...) {
     s <- sqrt(diag(object$vcov))
     object$se[get_parn(object,type)]
@@ -223,4 +224,5 @@ stdEr.admb <- function(object,type="fixed",...) {
 
 ##' @rdname AIC.admb
 ##' @method deviance admb
+##' @S3method deviance admb
 deviance.admb <- function(object,...) -2*object$loglik
