@@ -15,7 +15,9 @@ Suggests:
     coda,
     lme4,
     ggplot2,
-    testthat
+    testthat,
+    knitr
+VignetteBuilder: knitr
 License: GPL
 LazyLoad: yes
 Packaged: 2012-07-18 14:19:08 UTC; bolker

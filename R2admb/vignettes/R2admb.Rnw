@@ -2,6 +2,7 @@
 %\VignetteIndexEntry{basic examples of R2admb/AD Model Builder use}
 %\VignetteDepends{ggplot2}
 %\VignetteDepends{bbmle}
+%\VignetteEngine{knitr::knitr}
 \documentclass[11pt]{article}
 \usepackage[american]{babel}
 \usepackage[utf8]{inputenc}
@@ -27,11 +28,10 @@
 \begin{document}
 \maketitle
 
-\SweaveOpts{keep.source=TRUE}
-<<echo=FALSE>>=
-options(continue=" ")
+<<echo=FALSE,message=FALSE>>=
+library("knitr")
+opts_chunk$set(tidy=FALSE)
 @ 
-
 \section{Introduction}
 
 AD Model Builder (ADMB: \url{http://admb-project.org}) is a standalone program, developed by Dave Fournier continuously since the 1980s and released as an open source project in 2007, that takes as input an objective function (typically a negative log-likelihood function) and outputs the coefficients that minimize the objective function, along with various auxiliary information.  AD Model Builder uses \emph{automatic differentiation} (that's what ``AD'' stands for), a powerful algorithm for computing the derivatives of a specified objective function efficiently and without the typical errors due to finite differencing.  Because of this algorithm, and because the objective function is compiled into machine code before optimization, ADMB can solve large, difficult likelihood problems efficiently.  ADMB also has the capability to fit random-effects models (via Laplace approximation).
@@ -111,9 +111,11 @@ There are more steps this way, but you have a bit more control of the process.
 Here's a very simple example that can easily be done
 completely within R; we show how to do it with \code{R2admb} as well.
 
-<<libs>>=
+<<libs,message=FALSE>>=
 library(R2admb)
 library(ggplot2) ## for pictures
+theme_set(theme_bw())
+library(bbmle)
 @ 
 
 The data are from \cite{VoneshBolker2005}, describing the
@@ -137,7 +139,6 @@ ReedfrogSizepred <-
 Here is the code to fit a binomial model with
 \code{mle2} using these starting points:
 <<mlefit>>=
-library(bbmle)
 m0 <- mle2(Kill~dbinom(c*((TBL/d)*exp(1-TBL/d))^g,size=10),
            start=list(c=0.45,d=13,g=1),data=ReedfrogSizepred,
            method="L-BFGS-B",
@@ -156,12 +157,11 @@ predfr <-
 
 \begin{figure}
   \begin{center}
-<<fig1,echo=FALSE,fig=TRUE>>=
+<<fig1,echo=FALSE>>=
 g1  <- ggplot(ReedfrogSizepred,
               aes(x=TBL,y=Kill/10))+
     geom_point()+stat_sum(aes(size=factor(..n..)))+
-    geom_smooth()+
-    theme_bw()+
+    geom_smooth(method="loess")+
     labs(size="n",x="Size (total body length",
          y="Proportion killed")+
     coord_cartesian(ylim=c(-0.05,0.55))
@@ -216,9 +216,13 @@ Here is a \code{minimal} TPL (AD Model Builder definition) file:
     two vectors uses \code{elem\_prod} rather than \code{*}.
   \end{itemize}
     
-<<admbfit_getruns,echo=FALSE>>=
+<<admbfit_getruns>>=
 ## load in data from previously executed runs
-zz <- load("Reedfrog_runs.RData")
+load_doc <- function(x) {
+    load(system.file("doc",x,package="R2admb"),envir=.GlobalEnv) ##
+    ## would like parent.frame(2)) ... but doesn't work as I thought?
+}
+zz <- load_doc("Reedfrog_runs.RData")
 @ 
 
 To run this model, we save it in a text
@@ -244,7 +248,7 @@ m1 <- do_admb("ReedfrogSizepred0",
               params=rfs_params,
               bounds=rfs_bounds,
               run.opts=run.control(checkparam="write",
-                checkdata="write"))
+              checkdata="write"))
 unlink(c("reedfrogsizepred0.tpl",
          "reedfrogsizepred0_gen.tpl",
          "reedfrogsizepred0")) ## clean up leftovers
@@ -351,15 +355,13 @@ pdat <- rbind(cbind(as.data.frame(m0prof),method="mle2"),
               cbind(profnlist,method="ADMB_norm"))
 @ 
 
-\SweaveOpts{width=10,height=4}
-<<profpic,echo=FALSE,fig=TRUE>>=
-print(ggplot(pdat,aes(x=focal,y=abs(z),group=method,colour=method))+geom_line()+
+<<profpic,echo=FALSE,fig.width=10,fig.height=4,warning=FALSE>>=
+ggplot(pdat,aes(x=focal,y=abs(z),group=method,colour=method))+geom_line()+
       geom_point(alpha=0.5)+
   facet_grid(.~param,scale="free_x")+ylim(0,3)+xlab("")+
       ylab(expression(Delta(sqrt(-2*L))))+
-      geom_hline(yintercept=1.96,lty=2))
+      geom_hline(yintercept=1.96,lty=2)
 @ 
-\SweaveOpts{width=7,height=7}
 
 Notice that R evaluates the profile at a smaller number of locations,
 using spline interpolation to compute confidence intervals.
@@ -403,8 +405,8 @@ This information is stored in a list element called \verb+$hist+,
 as an object of class \code{admb\_hist}.  
 
 It has its own plot method:
-<<mchistplot,fig=TRUE>>=
-print(plot(m1MC$hist))
+<<mchistplot>>=
+plot(m1MC$hist)
 @ 
 
 (2) In addition the full set of samples, sampled as
@@ -425,8 +427,8 @@ Trace plots give a graphical diagnostic of the behavior
 of the MCMC chain.  In this case the diagnostics are
 \emph{not} good --- you should be looking for traces
 that essentially look like white noise.
-<<mctraceplot,fig=TRUE>>=
-print(xyplot(mmc))
+<<mctraceplot>>=
+xyplot(mmc)
 @ 
 (for larger sets of parameters you may want to specify
 a layout other than the default 1-row-by-$n$-columns,
@@ -469,8 +471,8 @@ HPDinterval(mmc)
 @ 
 
 Density plots show you the estimated posterior density of the variables:
-<<mcdensplot,fig=TRUE>>=
-print(densityplot(mmc))
+<<mcdensplot>>=
+densityplot(mmc)
 @ 
 
 See the documentation for the \code{coda} package for
@@ -488,10 +490,13 @@ Here, however, we show a very basic example, one of the GLMM examples used
 in the \code{lme4} package.
 
 Here's the \code{lme4} code to fit the model:
-<<lme4>>=
+<<lme4,message=FALSE>>=
 library(lme4)
-gm1 <- glmer(cbind(incidence, size - incidence) ~ period + (1 | herd),
-                family = binomial, data = cbpp)
+if (as.numeric(R.version$major)<3) {
+## FIXME
+    gm1 <- glmer(cbind(incidence, size - incidence) ~ period + (1 | herd),
+                 family = binomial, data = cbpp)
+}
 @ 
 
 To adapt this for ADMB, we first construct design matrices for the
@@ -530,8 +535,8 @@ Only a few new things to note here:
   
 See the ADMB-RE manual (\url{http://admb-project.googlecode.com/files/admb-re.pdf}) for more detail.
 
-<<loadtoy1,echo=FALSE>>=
-load("toy1_runs.RData")
+<<loadtoy1>>=
+zz2 <- load_doc("toy1_runs.RData")
 @ 
 
 The only changes in the \code{do\_admb} call are that 
@@ -564,7 +569,8 @@ read_admb("toy1_gen",profile=TRUE)
 Comparing \code{glmer} and \code{R2admb} results:
 
 <<coefsumlmer>>=
-coef(summary(gm1))
+## FIXME
+## coef(summary(gm1))
 @ 
 
 <<coefsumadmb>>=
@@ -576,10 +582,11 @@ Confirm that the random effects estimates are the same (note that the
 ADMB estimates are not scaled by the estimated standard deviation, so
 we do that by hand).
 
-<<ranefs,fig=TRUE>>=
-plot(ranef(gm1)$herd[,1],coef(d1)[6:20]*coef(d1)["sigma_herd"],
-     xlab="glmer estimate",ylab="ADMB estimate")
-abline(a=0,b=1)
+<<ranefs>>=
+## FIXME
+## plot(ranef(gm1)$herd[,1],coef(d1)[6:20]*coef(d1)["sigma_herd"],
+##     xlab="glmer estimate",ylab="ADMB estimate")
+## abline(a=0,b=1)
 @ 
 
 We can get confidence (credible) intervals based on the MCMC run:
@@ -590,6 +597,6 @@ HPDinterval(as.mcmc(d1$mcmc[,6:20]))
 
 That's all for now.
 
-%\section{Pella-Tomlinson model}
+
 \bibliography{R2admb}
 \end{document}
