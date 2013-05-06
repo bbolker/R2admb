@@ -298,18 +298,20 @@ read_tpl <- function(f) {
     if (!is.null(pp)) {
         pp <- proc_var(pp,maxlen=7)
         type <- 1 ## kluge for R CMD check warnings; will be masked
-        L1 <- with(pp,
-                   list(inits=pp[grep("^init",type),],
-                        raneff=pp[grep("^random",type),],
-                        sdnums=pp[grep("^sdreport_number",type),],
-                        sdvecs=pp[grep("^sdreport_vector",type),],
-                        other=pp[grep("^init|random|sdreport",type,invert=TRUE),],
-                        ## FIXME: don't know what I needed this for
-                        ## sdvecdims <- gsub("^ +sdreport_vector[ a-zA-Z]+","",
-                        ## gsub("[()]","",
-                        ## grep( "^ +sdreport_vector",splsec$PARAMETER,
-                        ## value=TRUE)))
-                        profparms=pp[grep("^likeprof",type),]))
+        if (!is.null(pp)) {
+            L1 <- with(pp,
+                       list(inits=pp[grep("^init",type),],
+                            raneff=pp[grep("^random",type),],
+                            sdnums=pp[grep("^sdreport_number",type),],
+                            sdvecs=pp[grep("^sdreport_vector",type),],
+                            other=pp[grep("^init|random|sdreport",type,invert=TRUE),],
+                            ## FIXME: don't know what I needed this for
+                            ## sdvecdims <- gsub("^ +sdreport_vector[ a-zA-Z]+","",
+                            ## gsub("[()]","",
+                            ## grep( "^ +sdreport_vector",splsec$PARAMETER,
+                            ## value=TRUE)))
+                            profparms=pp[grep("^likeprof",type),]))
+        }
     }
     pp <- splsec_proc$DATA
     if (!is.null(pp)) {
