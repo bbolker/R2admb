@@ -197,15 +197,18 @@ proc_var <- function(s,drop.first=TRUE,maxlen) {
   rest <- sapply(words,"[[",2)
   rest2 <- strsplit(gsub("[(),]"," ",rest)," ")
   vname <- sapply(rest2,"[[",1)
-  maxlen0 <- max(sapply(rest2,length))
-  if (missing(maxlen)) maxlen <- maxlen0
-  else maxlen <- pmax(maxlen,maxlen0)
-  opts <- t(sapply(rest2,
-           function(w) {
-             ## as.numeric()?
-             c(w[-1],rep(NA,maxlen+1-length(w)))
-           }))
-  data.frame(type,vname,opts,stringsAsFactors=FALSE)
+  if (length(rest2) == 0) ret <- NULL else {
+    maxlen0 <- max(sapply(rest2,length))
+    if (missing(maxlen)) maxlen <- maxlen0
+    else maxlen <- pmax(maxlen,maxlen0)
+    opts <- t(sapply(rest2,
+                     function(w) {
+                       ## as.numeric()?
+                       c(w[-1],rep(NA,maxlen+1-length(w)))
+                     }))
+    ret <- data.frame(type,vname,opts,stringsAsFactors=FALSE)
+  }
+  ret
 }
 
 drop_calcs <- function(s) {
