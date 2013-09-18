@@ -155,7 +155,7 @@ print.summary.admb <- function(x,
 	coefs <- x$coefficients
 	cat("Model file:",x$fn,"\n")
 	cat("Negative log-likelihood: ",sprintf("%1.1f",-x$loglik),"\t",
-            "AIC: ",sprintf("%.1f",-2*(x$npar+x$loglik)),"\n")
+            "AIC: ",sprintf("%.1f",-2*(x$loglik-x$npar)),"\n")
 	cat("Coefficients:\n")
 	printCoefmat(coefs, digits = digits, signif.stars = signif.stars, 
 			na.print = "NA", ...)
