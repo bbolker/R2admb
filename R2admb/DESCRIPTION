@@ -9,6 +9,7 @@ Description: A series of functions to call AD Model Builder (i.e.,
     compile and run models) from within R, read the results back
     into R as "admb" objects, and provide standard accessors (i.e.
     coef(), vcov(), etc.)
+Depends: R (>= 3.0.1)
 Suggests:
     bbmle,
     lattice,

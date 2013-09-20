@@ -261,7 +261,15 @@ read_rep <- function(fn,names=NULL) {
     fnx <- paste(fn,"rep",sep=".")
     ## check format!
     rr <- readLines(fnx)
-    if (!all(grepl("^#",rr) | grepl("^[0-9. e]",rr))) stop("report file in non-standard format")
+    ## FIXME: could test for numerics more carefully ...
+    numLines <- grepl("^[0-9. e]",rr)
+    commentLines <- grepl("^#",rr)
+    if (!all(numLines | commentLines) || !commentLines[1]) {
+        warning("report file in non-standard format")
+        if (all(numLines)) {
+            return(list(est=scan(text=rr,quiet=TRUE)))
+        }
+    }
     par_dat <- rs(fn,"rep")
     if (!file.exists(fnx)) stop("no REP file found")
     read_pars0(fnx,par_dat,skip=0)

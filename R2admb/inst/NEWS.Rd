@@ -4,8 +4,12 @@
 \title{R2admb News}
 \encoding{UTF-8}
 
-\section{Changes in version 0.7.999 }{
+\section{Changes in version 0.7.8 (2013-9-20}{
   \itemize{
+    \item bug fix for AIC
+    \item improvements to read_pars
+    \item allow all-numeric report file
+    \item bug fix for parameter section containing only LOCAL_CALCS
   }
 }
 
