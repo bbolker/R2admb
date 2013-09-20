@@ -42,7 +42,9 @@
 }
 \examples{
 orig <- Sys.getenv("ADMB_HOME")
- setup_admb("elsewhere")   ## this doesn't make sense but won't break anything until you actually try to run AD Model Builder
+## this doesn't make sense but won't break anything
+## until you actually try to run AD Model Builder
+ setup_admb("elsewhere")
  Sys.setenv(ADMB_HOME="") ## erase environment variable
 \dontrun{
  setup_admb()              ## auto-locate (fails if ADMB not found)
