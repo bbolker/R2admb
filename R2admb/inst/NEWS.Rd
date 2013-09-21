@@ -4,6 +4,13 @@
 \title{R2admb News}
 \encoding{UTF-8}
 
+\section{Changes in version 0.7.9 (2013-9-21}{
+  \itemize{
+    \item CRAN tweaks
+    \item admb_version now returns NA if ADMB not found
+  }
+}
+  
 \section{Changes in version 0.7.8 (2013-9-20}{
   \itemize{
     \item bug fix for AIC

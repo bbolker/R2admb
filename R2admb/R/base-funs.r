@@ -42,7 +42,7 @@ compile_admb <- function(fn,safe=FALSE,re=FALSE,verbose=FALSE,
 	admb_errors <- match.arg(admb_errors)
 	if (!file.exists(fn2 <- paste(fn,"tpl",sep=".")))
             stop("can't find TPL file ",fn2)
-	test <- try(system("admb",intern=TRUE))
+	test <- try(system("admb",intern=TRUE),silent=TRUE)
 	if (inherits(test,"try-error")) stop("base admb command failed: run setup_admb(), or check ADMB installation")
 	args <- ""
 	if (re) args <- "-r"

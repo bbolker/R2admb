@@ -1,6 +1,7 @@
 library(R2admb)
 
-if ((s <- setup_admb())!="") {
+s <- setup_admb()
+if (!identical(aa <- admb_version(),NA)) {
     ## run only if we can
     file.copy(system.file("tplfiles","ReedfrogSizepred0.tpl",package="R2admb"),"tadpole.tpl")
     tadpoledat <-  data.frame(TBL = rep(c(9,12,21,25,37),each=3),
