@@ -39,7 +39,7 @@ check_section <- function(fn,
             ## below), but otherwise allow lookup to fall back
             ## to the regular search path; there is probably a better
             ## way to handle this
-            attach(R_list,warn.conflicts=FALSE)
+            attach(R_list,name="R_list",warn.conflicts=FALSE)
             on.exit(detach(R_list),add=TRUE)
             ## now need to check dimensions etc...
             for (i in 1:nrow(info)) {
