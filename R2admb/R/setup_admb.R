@@ -59,6 +59,9 @@ setup_admb <- function(admb_home) {
                 } else if (file.exists("/usr/local/admb")) {
                     ## try default location
                     admb_home <- "/usr/local/admb"
+                } else if (file.exists("/Applications/ADMBTerminal.app/admb/admb")) {
+                    ## try default location for MacOSx application
+                    admb_home <- "/Applications/ADMBTerminal.app/admb"
                 } else {
                     admb_home <- ""
                 }
