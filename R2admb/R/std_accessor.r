@@ -4,8 +4,7 @@
 ##'from ADMB model fits
 ##'
 
-##' @method AIC admb
-##' @S3method AIC admb
+##' @export
 
 ##'@param x an ADMB model fit (of class "admb")
 ##'@param object an ADMB model fit (of class "admb")
@@ -56,8 +55,9 @@ format.perc <- function (probs, digits)  {
 }
 
 ##' @rdname AIC.admb
-##' @method confint admb
-##' @S3method confint admb
+##' @export
+##' @importFrom coda HPDinterval as.mcmc
+
 confint.admb <- function(object, parm, level=0.95, method="default", type="fixed", ...) {
     if (!missing(parm) && is.character(parm)) {
         ## try to catch mistakes like specifying method or type in parm slot
@@ -95,7 +95,6 @@ confint.admb <- function(object, parm, level=0.95, method="default", type="fixed
         if (method=="quantile") {
             tab <- t(apply(vals,2,quantile,c((1-level)/2,(1+level)/2)))
         } else {
-            require(coda)
             tab <- HPDinterval(as.mcmc(vals))
             colnames(tab) <- paste(c((1-level)/2,(1+level)/2)*100,"%")
         }
@@ -105,8 +104,7 @@ confint.admb <- function(object, parm, level=0.95, method="default", type="fixed
 }
 
 ##' @rdname AIC.admb
-##' @method print admb
-##' @S3method print admb
+##' @export
 print.admb <- function(x, verbose=FALSE, ...) {
 	cat("Model file:",x$fn,"\n")
 	if (is.null(x$loglik)) {
@@ -125,8 +123,7 @@ print.admb <- function(x, verbose=FALSE, ...) {
 }      
 
 ##' @rdname AIC.admb
-##' @method summary admb
-##' @S3method summary admb
+##' @export
 
 summary.admb <- function(object, correlation=FALSE, symbolic.cor = FALSE, ...) {
         coef.p <- unlist(coef(object,"par"))
@@ -144,8 +141,7 @@ summary.admb <- function(object, correlation=FALSE, symbolic.cor = FALSE, ...) {
 }
 
 ##' @rdname AIC.admb
-##' @method print summary.admb
-##' @S3method print summary.admb
+##' @export
 ##' @param digits number of digits to display
 ##' @param signif.stars show significance stars?
 print.summary.admb <- function(x,
@@ -180,8 +176,7 @@ get_parn <- function(x,type=c("par","fixed","random","extra","sdrpt","rep","all"
 }
     
 ##' @rdname AIC.admb
-##' @method logLik admb
-##' @S3method logLik admb
+##' @export
 logLik.admb <- function(object,...) {
     L <- object$loglik
     df <- length(coef(object))
@@ -193,15 +188,13 @@ logLik.admb <- function(object,...) {
 }
 
 ##' @rdname AIC.admb
-##' @method coef admb
-##' @S3method coef admb
+##' @export
 coef.admb <- function(object,type="fixed",...) {
     object$coefficients[get_parn(object,type)]
 }
 
 ##' @rdname AIC.admb
-##' @method vcov admb
-##' @S3method vcov admb
+##' @export
 vcov.admb <- function(object,type="fixed",...) {
     v <- object$vcov
     w <- get_parn(object,type)
@@ -215,14 +208,12 @@ stdEr <- function(object, ...) {
 }
 
 ##' @rdname AIC.admb
-##' @method stdEr admb
-##' @S3method stdEr admb
+##' @export
 stdEr.admb <- function(object,type="fixed",...) {
     s <- sqrt(diag(object$vcov))
     object$se[get_parn(object,type)]
 }
 
 ##' @rdname AIC.admb
-##' @method deviance admb
-##' @S3method deviance admb
+##' @export
 deviance.admb <- function(object,...) -2*object$loglik

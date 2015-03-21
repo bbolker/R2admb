@@ -59,9 +59,11 @@ setup_admb <- function(admb_home) {
                 } else if (file.exists("/usr/local/admb")) {
                     ## try default location
                     admb_home <- "/usr/local/admb"
-                } else {
+                } else if (file.exists("/Applications/ADMBTerminal.app/admb/admb")) {
+                    ## try default location for MacOSx applicationelse {
+                    admb_home <- "/Applications/ADMBTerminal.app/admb"
+                } else
                     admb_home <- ""
-                }
                 ## n.b. extra slash at end of ADMB_HOME is **VERY BAD** **VERY CONFUSING**
                 ##  provokes weird behavior where "bin/sedd..." turns into "binsedd..." ???
                 if (length(admb_home)>1) {

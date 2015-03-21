@@ -7,7 +7,9 @@
 #' @param pars passed to rhist
 #' @param \dots additional parameters for compatibility
 #' @return plot object 
-#' @S3method plot admb_hist
+#' @export
+#' @importFrom lattice xyplot
+
 ## don't know how to structure this properly.
 ##  I would like to have plot.admb_hist plot
 ##  a graph (as a side effect) and invisibly return a
@@ -40,7 +42,6 @@ plot.admb_hist <- function(x,type=c("lattice","ggplot"),
 			##     facet_wrap(~param,scales="free")+
 			##       labs(y="Frequency",x="")
 		} else if (type=="lattice") {
-			require(lattice)
 			##barchart(X2~X1|param,data=xx,horiz=FALSE,
 			vplot <- xyplot(X2~X1|param,type="s",data=xx,
 					scales=list(x=list(relation="free",tick.number=3),

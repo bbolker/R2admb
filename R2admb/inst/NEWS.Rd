@@ -4,6 +4,24 @@
 \title{R2admb News}
 \encoding{UTF-8}
 
+\section{Changes in version 0.7.12 (2015-3-21}{
+  \itemize{
+    \item add default location for MacOS ( Fernando Cagua )
+    \item various R CMD check/roxygenize updates
+  }
+}
+\section{Changes in version 0.7.11 (2014-5-01}{
+  \itemize{
+    \item update vignette, documentation tweaks
+  }
+}
+
+\section{Changes in version 0.7.10 (2013-9-22}{
+  \itemize{
+    \item test tweaks
+  }
+}
+
 \section{Changes in version 0.7.9 (2013-9-21}{
   \itemize{
     \item CRAN tweaks
