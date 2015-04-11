@@ -1,6 +1,6 @@
 library(R2admb)
 
-s <- setup_admb()
+s <- try(setup_admb())
 if (!identical(aa <- admb_version(),NA)) {
     ## run only if we can
     file.copy(system.file("tplfiles","ReedfrogSizepred0.tpl",package="R2admb"),"tadpole.tpl")
