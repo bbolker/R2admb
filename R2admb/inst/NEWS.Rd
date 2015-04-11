@@ -4,10 +4,12 @@
 \title{R2admb News}
 \encoding{UTF-8}
 
-\section{Changes in version 0.7.12 (2015-3-21}{
+\section{Changes in version 0.7.12 (2015-4-11}{
   \itemize{
     \item add default location for MacOS ( Fernando Cagua )
     \item various R CMD check/roxygenize updates
+    \item CRAN tweaks: package title in Title Case
+    \item admb_home goes at beginning of path on Unix
   }
 }
 \section{Changes in version 0.7.11 (2014-5-01}{
