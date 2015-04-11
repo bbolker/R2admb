@@ -12,14 +12,14 @@ tmpdat <- list(X=X,Zherd=Zherd,
                  nobs=nrow(cbpp))
 d1 <- do_admb("toy1",
               data=tmpdat,
-              re=TRUE,
+              re=list(u_herd=ncol(Zherd)),
               params=list(beta=rep(0,ncol(X)),sigma_herd=0.1),
               bounds=list(sigma_herd=c(0.0001,20)),
-              re_vectors=c(u_herd=ncol(Zherd)),
-              checkdata="write",checkparam="write",
+              run.opts=run.control(checkdata="write",
+                                   checkparam="write",
+                                   clean=FALSE),
               mcmc=TRUE,
-              mcmcpars=c("beta","sigma_herd"),
-              clean=FALSE)
+              mcmc.opts=mcmc.control(mcmcpars=c("beta","sigma_herd")))
 
 save("d1",file="toy1_runs.RData")
 unlink(c("toy1","toy1_gen.tpl"))
