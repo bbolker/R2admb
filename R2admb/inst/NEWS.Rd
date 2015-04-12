@@ -4,6 +4,12 @@
 \title{R2admb News}
 \encoding{UTF-8}
 
+\section{Changes in version 0.7.13 (2015-4-12}{
+  \itemize{
+    \item CRAN tweaks
+  }
+}
+
 \section{Changes in version 0.7.12 (2015-4-11}{
   \itemize{
     \item add default location for MacOS ( Fernando Cagua )
