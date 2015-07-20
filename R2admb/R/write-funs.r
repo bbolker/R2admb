@@ -19,6 +19,7 @@
 #'@author Hans Skaug
 #'@seealso \code{\link{read_pars}}
 #'@keywords misc
+#' @importFrom utils write.table
 write_pin <- "pin_write" <-
 		function (name, L) 
 {

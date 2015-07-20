@@ -1,3 +1,4 @@
+##' @importFrom stats na.omit
 check_section <- function(fn,
                           tpldat,
                           tplsec,

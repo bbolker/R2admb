@@ -1,35 +1,33 @@
-##'Standard accessor functions for ADMB model fits
+##' Standard accessor functions for ADMB model fits
 ##'
-##'Extract standard information such as log-likelihood, AIC, coefficients, etc.
-##'from ADMB model fits
+##' Extract standard information such as log-likelihood, AIC, coefficients, etc.
+##' from ADMB model fits
 ##'
 
-##' @export
-
-##'@param x an ADMB model fit (of class "admb")
-##'@param object an ADMB model fit (of class "admb")
-##'@param k penalty value for AIC fits
-##'@param type which type of parameters to report. Character vector, including
+##' @importFrom stats coef vcov pnorm qnorm deviance quantile printCoefmat
+##' @param x an ADMB model fit (of class "admb")
+##' @param object an ADMB model fit (of class "admb")
+##' @param k penalty value for AIC fits
+##' @param type which type of parameters to report. Character vector, including
 ##' one or more of "fixed" or "par" (standard, fixed-effect parameters);
 ##' "random" (random effect parameters); "rep" (report variables); "sdrpt" (sdreport variables);
 ##' "extra" (report and sdreport); "all" (all of the above).
-##'@param parm (currently ignored: FIXME) select parameters
-##'@param level alpha level for confidence interval
-##'@param method (character): "default" or "quad", quadratic (Wald) intervals
-##'based on approximate standard errors; "profile", profile CIs (if profile was
-##'computed); "quantile", CIs based on quantiles of the MCMC-generated posterior
-##'density (if MCMC was computed); "HPDinterval", CIs based on highest posterior
-##'density (ditto)
-##'@param correlation currently unused parameter
-##'@param symbolic.cor currently unused parameter
-##'@param verbose show messages
-##'@param \dots other parameters (for S3 generic compatibility)
-##'@return Extracts appropriate values: numeric (scalar) for AIC, type logLik
-##'for logLik, numeric vector of coefficients, numeric variance-covariance
-##'matrix of parameter estimates
-##'@author Ben Bolker
-##'@keywords misc
-##'@examples
+##' @param parm (currently ignored: FIXME) select parameters
+##' @param level alpha level for confidence interval
+##' @param method (character): "default" or "quad", quadratic (Wald) intervals
+##' based on approximate standard errors; "profile", profile CIs (if
+##' profile was computed); "quantile", CIs based on quantiles of the
+##' MCMC-generated posterior density (if MCMC was computed);
+##' "HPDinterval", CIs based on highest posterior density (ditto)
+##' @param correlation currently unused parameter
+##' @param symbolic.cor currently unused parameter
+##' @param verbose show messages
+##' @param \dots other parameters (for S3 generic compatibility)
+##' @return Extracts appropriate values: numeric (scalar) for AIC, type logLik
+##' for logLik, numeric vector of coefficients, numeric variance-covariance
+##' matrix of parameter estimates
+## '@keywords misc
+##' @examples
 ##'
 ##'  admbex <- system.file("doc","Reedfrog_runs.RData",package="R2admb")
 ##'  load(admbex)
@@ -43,6 +41,9 @@
 ##'  deviance(m1)
 ##'  stdEr(m1)
 ##'
+##' @rdname AIC.admb
+##' @importFrom stats AIC
+##' @export
 AIC.admb <- function(object,...,k=2) {
 	if (length(list(...))>0) stop("multi-object AIC not yet implemented")
 	deviance(object)+k*length(coef(object))
@@ -176,6 +177,7 @@ get_parn <- function(x,type=c("par","fixed","random","extra","sdrpt","rep","all"
 }
     
 ##' @rdname AIC.admb
+##' @importFrom stats logLik
 ##' @export
 logLik.admb <- function(object,...) {
     L <- object$loglik
@@ -188,12 +190,14 @@ logLik.admb <- function(object,...) {
 }
 
 ##' @rdname AIC.admb
+##' @importFrom stats AIC
 ##' @export
 coef.admb <- function(object,type="fixed",...) {
     object$coefficients[get_parn(object,type)]
 }
 
 ##' @rdname AIC.admb
+##' @importFrom stats vcov
 ##' @export
 vcov.admb <- function(object,type="fixed",...) {
     v <- object$vcov
@@ -215,5 +219,6 @@ stdEr.admb <- function(object,type="fixed",...) {
 }
 
 ##' @rdname AIC.admb
+##' @importFrom stats deviance
 ##' @export
 deviance.admb <- function(object,...) -2*object$loglik

@@ -4,6 +4,13 @@
 \title{R2admb News}
 \encoding{UTF-8}
 
+\section{Changes in version 0.7.13 (2015-7-20}{
+  \itemize{
+    \item truncate profile files to 8 characters
+    (Edgar Gonzalez)
+  }
+}
+
 \section{Changes in version 0.7.13 (2015-4-12}{
   \itemize{
     \item CRAN tweaks

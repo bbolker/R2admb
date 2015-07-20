@@ -31,6 +31,7 @@
 ##'@seealso \code{\link{write_pin}}, \code{\link{write_dat}}
 ##'@keywords misc
 ##'@export read_pars
+##' @importFrom utils count.fields read.table
 
 read_pars <- function (fn,drop_phase=TRUE) {
     ## see
@@ -351,6 +352,10 @@ read_tpl <- function(f) {
 ##' \item{cinorm}{confidence interval matrix, based on normal approximation}
 
 read_plt <- function(varname) {
+    if (nchar(varname)>8) {
+        message("truncating profile filename to 8 chars")
+        varname <- substr(varname,1,8)
+    }
     fn <- paste(varname,"plt",sep=".")
     r <- readLines(fn)
     cisecline <- grep("Minimum width confidence limits",r)

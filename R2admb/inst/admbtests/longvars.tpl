@@ -1,22 +1,12 @@
-DATA_SECTION
-
-  init_int nobs
-  init_vector nexposed(1,15)
-  init_vector TBL(1,15)
-  init_vector Kill(1,15)
-
 PARAMETER_SECTION
 
-  objective_function_value f
-  init_bounded_number c(0,1)
-  init_bounded_number d(0,50)
-  init_bounded_number g(-1,25)
   vector prob(1,nobs)    // per capita mort prob
+
 PROCEDURE_SECTION
 
   dvariable fpen=0.0;         // penalty variable
   // power-Ricker
-  prob = c*pow(elem_prod(TBL/d,exp(1-TBL/d)),g);
+  prob = ccc*pow(elem_prod(TBL/dddd,exp(1-TBL/dddd)),ggggggg);
   // penalties: constrain 0.001 <= prob <= 0.999
   prob = posfun(prob,0.001,fpen);
   f += 1000*fpen;

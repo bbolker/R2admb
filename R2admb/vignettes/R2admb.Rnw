@@ -1,8 +1,7 @@
-%\VignettePackage{R2admb}
-%\VignetteIndexEntry{basic examples of R2admb/AD Model Builder use}
+%\VignetteEngine{knitr::knitr}
 %\VignetteDepends{ggplot2}
 %\VignetteDepends{bbmle}
-%\VignetteEngine{knitr::knitr}
+%\VignetteIndexEntry{Basic examples of R2admb/AD Model Builder use}
 \documentclass[11pt]{article}
 \usepackage[american]{babel}
 \usepackage[utf8]{inputenc}
@@ -104,10 +103,11 @@ Here's a very simple example that can easily be done
 completely within R; we show how to do it with \code{R2admb} as well.
 
 <<libs,message=FALSE>>=
-library(R2admb)
-library(ggplot2) ## for pictures
+library("R2admb")
+library("ggplot2") ## for pictures
 theme_set(theme_bw())  ## cosmetic
-library(bbmle)
+library("grid"); zmargin <- theme(panel.margin=unit(0,"lines"))
+library("bbmle")
 @ 
 
 The data are from \cite{VoneshBolker2005}, describing the
@@ -135,7 +135,7 @@ m0 <- mle2(Kill~dbinom(c*((TBL/d)*exp(1-TBL/d))^g,size=10),
            start=list(c=0.45,d=13,g=1),data=ReedfrogSizepred,
            method="L-BFGS-B",
            lower=c(c=0.003,d=10,g=0),
-           upper=c(c=0.8,d=20,g=20),
+           upper=c(c=0.8,d=20,g=60),
            control=list(parscale=c(c=0.5,d=10,g=1)))
 @ 
 
@@ -245,7 +245,7 @@ m1 <- do_admb("ReedfrogSizepred0",
               params=rfs_params,
               bounds=rfs_bounds,
               run.opts=run.control(checkparam="write",
-              checkdata="write"))
+              checkdata="write",clean=FALSE))
 unlink(c("reedfrogsizepred0.tpl",
          "reedfrogsizepred0_gen.tpl",
          "reedfrogsizepred0")) ## clean up leftovers
@@ -335,6 +335,7 @@ m1P <- do_admb("ReedfrogSizepred0",
                run.opts=run.control(checkparam="write",
                checkdata="write"),
                profile=TRUE,
+               workdir=".",
                profile.opts=list(pars=c("c","d","g")))
 @ 
 
@@ -362,13 +363,24 @@ tmpf <- function(p,w="prof") {
   pp <- log(m1P$prof[[p]][[w]][,2])
   pp <- max(pp)-pp
   data.frame(param=p,z=sqrt(2*pp),
-             par.vals.c=NA,par.vals.d=NA,par.vals.g=NA,focal=m1P$prof[[p]][[w]][,1])
+             par.vals.c=NA,par.vals.d=NA,par.vals.g=NA,
+             focal=m1P$prof[[p]][[w]][,1])
+}
+quadf <- function(p) {
+    m <- coef(m0)[p]
+    se <- stdEr(m0)[p]
+    pvec <- seq(m-3*se,m+3*se,length=31)
+    data.frame(param=p,z=abs(pvec-m)/se,
+                focal=pvec,
+                par.vals.c=NA,par.vals.d=NA,par.vals.g=NA)
 }
 proflist <- do.call(rbind,lapply(list("c","d","g"),tmpf))
 profnlist <- do.call(rbind,lapply(list("c","d","g"),tmpf,w="prof_norm"))
+quadlist <- do.call(rbind,lapply(list("c","d","g"),quadf))
 pdat <- rbind(cbind(as.data.frame(m0prof),method="mle2"),
               cbind(proflist,method="ADMB"),
-              cbind(profnlist,method="ADMB_norm"))
+              cbind(profnlist,method="ADMB_norm"),
+              cbind(quadlist,method="Wald"))
 @ 
 
 <<profpic,echo=FALSE,fig.width=8,fig.height=3.2,warning=FALSE>>=
@@ -376,7 +388,7 @@ ggplot(pdat,aes(x=focal,y=abs(z),group=method,colour=method))+geom_line()+
       geom_point(alpha=0.5)+
   facet_grid(.~param,scale="free_x")+ylim(0,3)+xlab("")+
       ylab(expression(Delta(sqrt(-2*L))))+
-      geom_hline(yintercept=1.96,lty=2)
+      geom_hline(yintercept=1.96,lty=2)+zmargin
 @ 
 
 Notice that R evaluates the profile at a smaller number of locations,
