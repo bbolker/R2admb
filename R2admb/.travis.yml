@@ -1,6 +1,5 @@
 ## Sample .travis.yml file for use with metacran/r-builder
 ## See https://github.com/metacran/r-builder for details.
-
 language: c
 sudo: required
 
