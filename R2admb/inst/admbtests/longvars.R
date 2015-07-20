@@ -27,7 +27,6 @@ m1 <- do_admb(fn,
 
 
 
-
 m1P <- do_admb(fn,
               data=c(list(nobs=nrow(ReedfrogSizepred),
                 nexposed=rep(10,nrow(ReedfrogSizepred))),
