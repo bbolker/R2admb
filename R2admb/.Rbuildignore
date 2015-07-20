@@ -2,4 +2,5 @@ TODO.md
 misc/
 cache/
 figure/
+^.travis\..yml$
 
