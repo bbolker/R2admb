@@ -10,10 +10,11 @@
 ##'admodel.hes for hessian; and admodel.cov for
 ##'covariance matrix.  \code{read_psv} reads the output of MCMC runs
 ##'
-##'@rdname read_pars
-##'@param fn (character) Base name of AD Model Builder
-##'@param drop_phase (logical) drop negative-phase (fixed) parameters from results?
-##'@return List containing the following elements
+##' @rdname read_pars
+##' @param fn (character) Base name of AD Model Builder
+##' @param drop_phase (logical) drop negative-phase (fixed) parameters from results?
+##' @param covfn (character) file name for covariance matrix information
+##' @return List containing the following elements
 ##' \itemize{
 ##' \item{coefficients}{parameter estimates}
 ##' \item{coeflist}{parameter estimates in list format, with proper shape (vectors, matrices, etc.)}
@@ -25,15 +26,19 @@
 ##' \item{npar}{number of parameters}
 ##' \item{hes}{hessian matrix (only if no vcov matrix)}
 ##' }
-##'@section Warning: The \code{coeflist} component is untested for data
-##'structures more complicated than scalars, vectors or matrices (i.e. higher-dimensional or ragged arrays)
+##' @section Warnings:
+##' \itemize{
+##' \item{The \code{coeflist} component is untested for data
+##'structures more complicated than scalars, vectors or matrices (i.e. higher-dimensional or ragged arrays)}
+##' \item{Because ADMB hard-codes the file name for covariance matrix information (\code{admodel.cov}), care is necessary when running different models in the same directory; users may want to rename this file by hand and use the \code{covfn} argument}
+##' }
 ##'@author Ben Bolker
 ##'@seealso \code{\link{write_pin}}, \code{\link{write_dat}}
 ##'@keywords misc
 ##'@export read_pars
 ##' @importFrom utils count.fields read.table
 
-read_pars <- function (fn,drop_phase=TRUE) {
+read_pars <- function (fn,drop_phase=TRUE,covfn="admodel.cov") {
     ## see
     ##  http://admb-project.org/community/admb-meeting-march-29-31/InterfacingADMBwithR.pdf
     ## for an alternate file reader -- does this have equivalent functionality?
@@ -109,8 +114,13 @@ read_pars <- function (fn,drop_phase=TRUE) {
         ## less accurate, but available for all parameters (RE, extra)
         vcov <- cormat*outer(std,std)
         if (!is.matrix(cormat)) cormat <- vcov ## (missing cor file)
-        if(file.exists("admodel.cov"))
+        if(file.exists(covfn))
         {
+            ## 
+            if (covfn=="admodel.cov" &&
+                length(list.files(pattern="\\.std"))>1) {
+                warning("multiple .std files found; admodel.cov may have been overwritten")
+            }
             ## see also:
             ## http://www.admb-project.org/examples/admb-tricks/covariance-calculations/r-code-to-interact-with-admodel.cov/view
             ## more accurate, binary info

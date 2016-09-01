@@ -9,17 +9,38 @@ Description: A series of functions to call 'AD Model Builder' (i.e.,
     compile and run models) from within R, read the results back
     into R as 'admb' objects, and provide standard accessors (i.e.
     coef(), vcov(), etc.)
-Depends: R (>= 3.0.1)
-Imports: coda, lattice
-Suggests: bbmle, lme4, ggplot2, testthat, knitr
+Depends:
+    R (>= 3.0.1)
+Imports:
+    coda,
+    lattice
+Suggests:
+    bbmle,
+    lme4,
+    ggplot2,
+    testthat,
+    knitr
 SystemRequirements: AD Model Builder <http://admb-project.org>
 VignetteBuilder: knitr
 License: GPL
 LazyLoad: yes
 Repository: CRAN
-Collate: 'R2admb-package.R' 'base-funs.r' 'check_section.R' 'do_admb.r'
-        'mcmc.control.r' 'plot.admb_hist.r' 'read-funs.r' 'readfit.R'
-        'run.control.r' 'setup_admb.R' 'std_accessor.r'
-        'utility-funs.R' 'write-funs.r' 'extract_gradient.r'
-        'find_large_cor.r' 'get_version.r'
+Collate:
+    'R2admb-package.R'
+    'base-funs.r'
+    'check_section.R'
+    'do_admb.r'
+    'mcmc.control.r'
+    'plot.admb_hist.r'
+    'read-funs.r'
+    'readfit.R'
+    'run.control.r'
+    'setup_admb.R'
+    'std_accessor.r'
+    'utility-funs.R'
+    'write-funs.r'
+    'extract_gradient.r'
+    'find_large_cor.r'
+    'get_version.r'
 NeedsCompilation: no
+RoxygenNote: 5.0.1
