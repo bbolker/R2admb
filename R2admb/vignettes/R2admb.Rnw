@@ -106,7 +106,7 @@ completely within R; we show how to do it with \code{R2admb} as well.
 library("R2admb")
 library("ggplot2") ## for pictures
 theme_set(theme_bw())  ## cosmetic
-library("grid"); zmargin <- theme(panel.margin=unit(0,"lines"))
+zmargin <- theme(panel.spacing=grid::unit(0,"lines"))
 library("bbmle")
 @ 
 
@@ -152,7 +152,7 @@ predfr <-
 <<fig1,echo=FALSE>>=
 g1  <- ggplot(ReedfrogSizepred,
               aes(x=TBL,y=Kill/10))+
-    geom_point()+stat_sum(aes(size=factor(..n..)))+
+    geom_point()+stat_sum(aes(size=..n..))+
     geom_smooth(method="loess")+
     labs(size="n",x="Size (total body length",
          y="Proportion killed")+

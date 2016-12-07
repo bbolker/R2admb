@@ -3,4 +3,7 @@ misc/
 cache/
 figure/
 ^.travis\..yml$
-
+.*\.log
+.*\.aux
+.*\.bbl
+.*\.blg
