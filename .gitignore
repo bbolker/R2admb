@@ -2,6 +2,7 @@
 *.blg
 *.aux
 *.log
+*.out
 cache
 files
 
