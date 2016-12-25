@@ -1,14 +1,14 @@
-##'Read in parameters from an AD Model Builder run
+##' Read in parameters from an AD Model Builder run
 ##'
-##'Reads coefficients, standard errors, log-likelihoods, maximum gradients,
-##'correlation and variance-covariance matrices from AD Model Builder output
-##'files
+##' Reads coefficients, standard errors, log-likelihoods, maximum gradients,
+##' correlation and variance-covariance matrices from AD Model Builder output
+##' files
 ##'
-##'Given the output from an ADMB run on FOO.tpl, \code{read_pars} reads the
-##'files FOO.par (parameters, log-likelihood, max gradient); FOO.std (standard
-##'deviations); FOO.cor (correlations); FOO.rep (report variables);
-##'admodel.hes for hessian; and admodel.cov for
-##'covariance matrix.  \code{read_psv} reads the output of MCMC runs
+##' Given the output from an ADMB run on FOO.tpl, \code{read_pars} reads the
+##' files FOO.par (parameters, log-likelihood, max gradient); FOO.std (standard
+##' deviations); FOO.cor (correlations); FOO.rep (report variables);
+##' admodel.hes for hessian; and admodel.cov for
+##' covariance matrix.  \code{read_psv} reads the output of MCMC runs.
 ##'
 ##' @rdname read_pars
 ##' @param fn (character) Base name of AD Model Builder
@@ -25,6 +25,18 @@
 ##' \item{vcov}{variance-covariance matrix}
 ##' \item{npar}{number of parameters}
 ##' \item{hes}{hessian matrix (only if no vcov matrix)}
+##' \item{report}{values from report file (if non-standard report file)}
+##' }
+##' @details
+##' \itemize{
+##' \code{read_rep} (called by \code{read_admb} to read the \code{.rep} file) first
+##' checks if the report file is in a standard format: first line starts with a
+##' comment character (#); thereafter, each block starts with a single commented
+##' line containing the name of the parameter (possibly ending with a colon),
+##' followed by a block of all-numeric lines, which are read as a single vector.
+##' If the report file is in a standard format, the values are added to the end
+##' of the coefficients list.  Otherwise, the numeric values from the report file
+##' are included in the results as a single, concantenated numeric vector.
 ##' }
 ##' @section Warnings:
 ##' \itemize{
@@ -32,7 +44,6 @@
 ##'structures more complicated than scalars, vectors or matrices (i.e. higher-dimensional or ragged arrays)}
 ##' \item{Because ADMB hard-codes the file name for covariance matrix information (\code{admodel.cov}), care is necessary when running different models in the same directory; users may want to rename this file by hand and use the \code{covfn} argument}
 ##' }
-##'@author Ben Bolker
 ##'@seealso \code{\link{write_pin}}, \code{\link{write_dat}}
 ##'@keywords misc
 ##'@export read_pars
@@ -164,7 +175,7 @@ read_pars <- function (fn,drop_phase=TRUE,covfn="admodel.cov") {
     npar_rep <- length(repvals$est)
     ## return npar as number of columns in vcov and npar_total as npar+re
     if (is.null(nopar)) nopar <- npar
-    list(coefficients=c(est,sdrptvals,repvals$est),
+    r <- list(coefficients=c(est,sdrptvals,repvals$est),
          coeflist=c(parlist,repvals$parlist),
          se=std, loglik=-loglik, maxgrad=-maxgrad, cor=cormat, vcov=vcov,
          npar=nopar,           ## fixed-effect
@@ -173,6 +184,8 @@ read_pars <- function (fn,drop_phase=TRUE,covfn="admodel.cov") {
          npar_rep=npar_rep,     ## report
          npar_total=length(est)+length(sdrptvals)+npar_rep, ## all
          hes=hes)
+    if (is.list(repvals) && identical(names(repvals),"report")) r <- c(r,repvals)
+    return(r)
 }
 
 rt <- function(f,ext,...) {
@@ -180,6 +193,8 @@ rt <- function(f,ext,...) {
     if (file.exists(fn)) read.table(fn,...) else NA
 }
 
+## util function: read from a file
+##  that has only numeric values
 rs <- function(f,ext,comment.char="#",...) {
     fn <- paste(f,ext,sep=".")
     if (file.exists(fn)) scan(fn,
@@ -197,7 +212,7 @@ read_pars0 <- function(fnext,par_dat,skip=1) {
     npar2 <- length(parlines)  ## number of distinct parameters
     parlen <- count.fields(fnext,skip=skip)
     parlen2 <- count.fields(fnext,comment.char="",skip=skip)
-    parnames0 <- parnames <- gsub("^# +","",gsub(":$","",tmp2[parlines]))
+    parnames0 <- parnames <- gsub("^# *","",gsub(":$","",tmp2[parlines]))
     parlist <- vector("list",npar2)
     parnameslist <- vector("list",npar2)
     names(parlist) <- parnames
@@ -206,30 +221,25 @@ read_pars0 <- function(fnext,par_dat,skip=1) {
     pp <- c(parlines,length(tmp2)+1)
     ## reshape parameters properly
     parid <- numeric(npar2)
-	## If report file didn't contain #value to identify report segments, 
-	## it would cause:  Error in cumline:(cumline + nrows - 1) : NA/NaN argument; adding the if below 
-	## solved that problem. J.Laake 7/1/2013
-	if(npar2>0)
-    for (i in seq(npar2)) {
-        nrows <- diff(pp)[i]-1
-        curlines <- cumline:(cumline+nrows-1)
-        curlen <- sum(parlen[curlines])
-        parvals <- par_dat[cumpar:(cumpar+curlen-1)]
-                                        #    if (nrows==1) {
-        if (curlen==1) {
-            parnameslist[[i]] <- parnames[i]
-        } else {
-            parnameslist[[i]] <- numfmt(parnames[i],curlen)
+    ## If report file didn't contain #value to identify report segments, 
+    ## it would cause:  Error in cumline:(cumline + nrows - 1) : NA/NaN argument; adding the if below 
+    ## solved that problem. J.Laake 7/1/2013
+    if(npar2>0) {
+        for (i in seq(npar2)) {
+            nrows <- diff(pp)[i]-1
+            curlines <- cumline:(cumline+nrows-1)
+            curlen <- sum(parlen[curlines])
+            parvals <- par_dat[cumpar:(cumpar+curlen-1)]
+            ##    if (nrows==1) {
+            if (curlen==1) {
+                parnameslist[[i]] <- parnames[i]
+            } else {
+                parnameslist[[i]] <- numfmt(parnames[i],curlen)
+            }
+            parlist[[i]] <- parvals
+            cumline <- cumline + nrows
+            cumpar <- cumpar + curlen
         }
-        parlist[[i]] <- parvals
-                                        #    } else {
-                                        #      parlist[[i]] <- matrix(parvals,nrow=nrows,byrow=TRUE)
-                                        #      parnameslist[[i]] <- numfmt2(parnames[i],dim(parlist[[i]]))
-                                        #    }
-        ## cat(parnames[i],cumline,cumline+nrows-1,cumpar,cumpar+curlen-1,parnameslist[[i]],"\n")
-        ## print(parlist[[i]])
-        cumline <- cumline + nrows
-        cumpar <- cumpar + curlen
     }
     ## FIXME: watch out, 'short param names' has now been overwritten by 'long param names'
     parnames <- unlist(parnameslist)
@@ -275,15 +285,15 @@ read_rep <- function(fn,names=NULL) {
     ## FIXME: could test for numerics more carefully ...
     numLines <- grepl("^[0-9. e]",rr)
     commentLines <- grepl("^#",rr)
-    if (!all(numLines | commentLines) || !commentLines[1]) {
+    stringLines <- grepl("^[[:alpha:]]*$",rr)
+    if (!all(numLines | commentLines | stringLines) || !commentLines[1]) {
         warning("report file in non-standard format")
-        if (all(numLines)) {
-            return(list(est=scan(text=rr,quiet=TRUE)))
-        }
+        return(list(report=scan(text=rr[numLines],quiet=TRUE)))
+    } else {
+        par_dat <- rs(fn,"rep")
+        if (!file.exists(fnx)) stop("no REP file found")
+        return(read_pars0(fnx,par_dat,skip=0))
     }
-    par_dat <- rs(fn,"rep")
-    if (!file.exists(fnx)) stop("no REP file found")
-    read_pars0(fnx,par_dat,skip=0)
 }
 
 read_tpl <- function(f) {

@@ -33,6 +33,7 @@ List containing the following elements
 \item{vcov}{variance-covariance matrix}
 \item{npar}{number of parameters}
 \item{hes}{hessian matrix (only if no vcov matrix)}
+\item{report}{values from report file (if non-standard report file)}
 }
 }
 \description{
@@ -45,7 +46,19 @@ Given the output from an ADMB run on FOO.tpl, \code{read_pars} reads the
 files FOO.par (parameters, log-likelihood, max gradient); FOO.std (standard
 deviations); FOO.cor (correlations); FOO.rep (report variables);
 admodel.hes for hessian; and admodel.cov for
-covariance matrix.  \code{read_psv} reads the output of MCMC runs
+covariance matrix.  \code{read_psv} reads the output of MCMC runs.
+
+
+\itemize{
+\code{read_rep} (called by \code{read_admb} to read the \code{.rep} file) first
+checks if the report file is in a standard format: first line starts with a
+comment character (#); thereafter, each block starts with a single commented
+line containing the name of the parameter (possibly ending with a colon),
+followed by a block of all-numeric lines, which are read as a single vector.
+If the report file is in a standard format, the values are added to the end
+of the coefficients list.  Otherwise, the numeric values from the report file
+are included in the results as a single, concantenated numeric vector.
+}
 }
 \section{Warnings}{
 
@@ -54,9 +67,6 @@ covariance matrix.  \code{read_psv} reads the output of MCMC runs
 structures more complicated than scalars, vectors or matrices (i.e. higher-dimensional or ragged arrays)}
 \item{Because ADMB hard-codes the file name for covariance matrix information (\code{admodel.cov}), care is necessary when running different models in the same directory; users may want to rename this file by hand and use the \code{covfn} argument}
 }
-}
-\author{
-Ben Bolker
 }
 \seealso{
 \code{\link{write_pin}}, \code{\link{write_dat}}
