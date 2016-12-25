@@ -40,8 +40,8 @@ check_section <- function(fn,
             ## below), but otherwise allow lookup to fall back
             ## to the regular search path; there is probably a better
             ## way to handle this
-            attach(R_list,name="R_list",warn.conflicts=FALSE)
-            on.exit(detach(R_list),add=TRUE)
+            ## attach(R_list,name="R_list",warn.conflicts=FALSE)
+            ## on.exit(detach(R_list),add=TRUE)
             ## now need to check dimensions etc...
             for (i in 1:nrow(info)) {
                 v <- info[i,]
@@ -61,7 +61,7 @@ check_section <- function(fn,
                     if (any(is.na(c(v$X1,v$X2)))) {
                         msg <- paste(msg,"NAs in dimensions in ",v$vname)
                     } else {
-                        tpllen <- eval(parse(text=paste(v$X2,"-",v$X1)))+1
+                        tpllen <- eval(parse(text=paste(v$X2,"-",v$X1)),envir=R_list)+1
                         if (length(x)!=tpllen)
                             msg <- paste(msg,"length mismatch in ",v$vname,
                                          ": ",length(x)," (r) != ",tpllen," (tpl)",
@@ -70,8 +70,8 @@ check_section <- function(fn,
                 }
                 if (v$type %in% c("imatrix","matrix")) { 
                     tpldim <- with(v,c(
-                                       eval(parse(text=paste(v$X2,"-",v$X1)))+1,
-                                       eval(parse(text=paste(v$X4,"-",v$X3)))+1))
+                                       eval(parse(text=paste(v$X2,"-",v$X1)),envir=R_list)+1,
+                                       eval(parse(text=paste(v$X4,"-",v$X3)),envir=R_list)+1))
                     rdim <- dim(x)
                     if (is.null(rdim)) {
                         msg <- paste(msg,v$vname,"not a matrix;")
@@ -88,7 +88,7 @@ check_section <- function(fn,
                     tpldim <- numeric(arraydim)
                     for (j in 1:arraydim) {
                         tpldim[j] <-
-                            eval(parse(text=paste(v[2*j+2],"-",v[2*j+1])))+1
+                            eval(parse(text=paste(v[2*j+2],"-",v[2*j+1])),envir=R_list)+1
                     }
                     rdim <- dim(x)
                     if (is.null(rdim)) {
