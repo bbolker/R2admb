@@ -25,22 +25,5 @@ VignetteBuilder: knitr
 License: GPL
 LazyLoad: yes
 Repository: CRAN
-Collate:
-    'R2admb-package.R'
-    'base-funs.r'
-    'check_section.R'
-    'do_admb.r'
-    'mcmc.control.r'
-    'plot.admb_hist.r'
-    'read-funs.r'
-    'readfit.R'
-    'run.control.r'
-    'setup_admb.R'
-    'std_accessor.r'
-    'utility-funs.R'
-    'write-funs.r'
-    'extract_gradient.r'
-    'find_large_cor.r'
-    'get_version.r'
 NeedsCompilation: no
 RoxygenNote: 5.0.1
