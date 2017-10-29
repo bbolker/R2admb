@@ -14,6 +14,7 @@
 ##' @param fn (character) Base name of AD Model Builder
 ##' @param drop_phase (logical) drop negative-phase (fixed) parameters from results?
 ##' @param covfn (character) file name for covariance matrix information
+##' @param warn_nonstd_rep warn if report file is in nonstandard format?
 ##' @return List containing the following elements
 ##' \itemize{
 ##' \item{coefficients}{parameter estimates}
@@ -48,8 +49,8 @@
 ##'@keywords misc
 ##'@export read_pars
 ##' @importFrom utils count.fields read.table
-
-read_pars <- function (fn,drop_phase=TRUE,covfn="admodel.cov") {
+read_pars <- function (fn,drop_phase=TRUE,covfn="admodel.cov",
+                       warn_nonstd_rep=TRUE) {
     ## see
     ##  http://admb-project.org/community/admb-meeting-march-29-31/InterfacingADMBwithR.pdf
     ## for an alternate file reader -- does this have equivalent functionality?
@@ -168,8 +169,8 @@ read_pars <- function (fn,drop_phase=TRUE,covfn="admodel.cov") {
     reportfile <- paste(fn,"rep",sep=".")
     repvals <- list()
     if (file.exists(reportfile)) {
-        if (file.info(reportfile)$size > 0){
-            repvals <- read_rep(fn)
+        if (file.info(reportfile)$size > 0) {
+            repvals <- read_rep(fn,warn_nonstd_rep=warn_nonstd_rep)
         }
     }
     npar_rep <- length(repvals$est)
@@ -277,7 +278,7 @@ read_psv <- function(fn,names=NULL) {
 
 ##'@rdname read_pars
 ##'@export read_rep
-read_rep <- function(fn,names=NULL) {
+read_rep <- function(fn,names=NULL,warn_nonstd_rep=TRUE) {
     fn <- tolower(fn)
     fnx <- paste(fn,"rep",sep=".")
     ## check format!
@@ -287,7 +288,9 @@ read_rep <- function(fn,names=NULL) {
     commentLines <- grepl("^#",rr)
     stringLines <- grepl("^[[:alpha:]]*$",rr)
     if (!all(numLines | commentLines | stringLines) || !commentLines[1]) {
-        warning("report file in non-standard format")
+        if (warn_nonstd_rep) {
+            warning("report file in non-standard format")
+        }
         return(list(report=scan(text=rr[numLines],quiet=TRUE)))
     } else {
         par_dat <- rs(fn,"rep")
