@@ -6,11 +6,12 @@
 \alias{read_rep}
 \title{Read in parameters from an AD Model Builder run}
 \usage{
-read_pars(fn, drop_phase = TRUE, covfn = "admodel.cov")
+read_pars(fn, drop_phase = TRUE, covfn = "admodel.cov",
+  warn_nonstd_rep = TRUE)
 
 read_psv(fn, names = NULL)
 
-read_rep(fn, names = NULL)
+read_rep(fn, names = NULL, warn_nonstd_rep = TRUE)
 }
 \arguments{
 \item{fn}{(character) Base name of AD Model Builder}
@@ -18,6 +19,8 @@ read_rep(fn, names = NULL)
 \item{drop_phase}{(logical) drop negative-phase (fixed) parameters from results?}
 
 \item{covfn}{(character) file name for covariance matrix information}
+
+\item{warn_nonstd_rep}{warn if report file is in nonstandard format?}
 
 \item{names}{(character) Names of variables}
 }
@@ -68,8 +71,8 @@ structures more complicated than scalars, vectors or matrices (i.e. higher-dimen
 \item{Because ADMB hard-codes the file name for covariance matrix information (\code{admodel.cov}), care is necessary when running different models in the same directory; users may want to rename this file by hand and use the \code{covfn} argument}
 }
 }
+
 \seealso{
 \code{\link{write_pin}}, \code{\link{write_dat}}
 }
 \keyword{misc}
-

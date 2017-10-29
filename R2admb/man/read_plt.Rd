@@ -20,4 +20,3 @@ List containing the following elements:
 Read in the output from ADMB likelihood profiling stored in a \code{.plt}
 file
 }
-

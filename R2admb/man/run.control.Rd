@@ -43,4 +43,3 @@ A helper function
 Ben Bolker
 }
 \keyword{misc}
-

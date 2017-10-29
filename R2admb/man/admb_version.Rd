@@ -19,4 +19,3 @@ admb_version()
 Ben Bolker
 }
 \keyword{misc}
-

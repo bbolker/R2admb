@@ -21,4 +21,3 @@ ascending absolute value of the gradient.
 \author{
 Jeff Laake
 }
-

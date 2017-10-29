@@ -2,16 +2,16 @@
 % Please edit documentation in R/std_accessor.r
 \name{AIC.admb}
 \alias{AIC.admb}
-\alias{coef.admb}
 \alias{confint.admb}
-\alias{deviance.admb}
-\alias{logLik.admb}
 \alias{print.admb}
+\alias{summary.admb}
 \alias{print.summary.admb}
+\alias{logLik.admb}
+\alias{coef.admb}
+\alias{vcov.admb}
 \alias{stdEr}
 \alias{stdEr.admb}
-\alias{summary.admb}
-\alias{vcov.admb}
+\alias{deviance.admb}
 \title{Standard accessor functions for ADMB model fits}
 \usage{
 \method{AIC}{admb}(object, ..., k = 2)
@@ -43,6 +43,8 @@ stdEr(object, ...)
 \arguments{
 \item{object}{an ADMB model fit (of class "admb")}
 
+\item{\dots}{other parameters (for S3 generic compatibility)}
+
 \item{k}{penalty value for AIC fits}
 
 \item{parm}{(currently ignored: FIXME) select parameters}
@@ -71,8 +73,6 @@ one or more of "fixed" or "par" (standard, fixed-effect parameters);
 \item{digits}{number of digits to display}
 
 \item{signif.stars}{show significance stars?}
-
-\item{\dots}{other parameters (for S3 generic compatibility)}
 }
 \value{
 Extracts appropriate values: numeric (scalar) for AIC, type logLik
@@ -98,4 +98,3 @@ from ADMB model fits
  stdEr(m1)
 
 }
-

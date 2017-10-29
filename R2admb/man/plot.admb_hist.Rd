@@ -23,4 +23,3 @@ plot object
 \description{
 Plot MCMC histogram
 }
-

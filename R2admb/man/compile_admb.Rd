@@ -2,8 +2,8 @@
 % Please edit documentation in R/base_funs.r
 \name{compile_admb}
 \alias{compile_admb}
-\alias{read_admb}
 \alias{run_admb}
+\alias{read_admb}
 \title{Compile ADMB files, run, read output}
 \usage{
 compile_admb(fn,safe=FALSE,re=FALSE,
@@ -62,4 +62,3 @@ Compiling also sets executable mode.
 Ben Bolker
 }
 \keyword{misc}
-

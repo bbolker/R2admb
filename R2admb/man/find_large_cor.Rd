@@ -24,4 +24,3 @@ from lower triangular matrix.
 \author{
 Jeff Laake
 }
-

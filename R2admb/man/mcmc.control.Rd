@@ -60,4 +60,3 @@ mcmc.control(mcmc=2000)
 Ben Bolker
 }
 \keyword{misc}
-
