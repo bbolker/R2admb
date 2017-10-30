@@ -4,6 +4,14 @@
 \title{R2admb News}
 \encoding{UTF-8}
 
+\section{Changes in version 0.7.16 (2017-10-29}{
+  \itemize{
+    \item handle non-standard report files better; add flag to ignore them
+    (i.e. not warn) if requested
+    \item internal cleanup
+  }
+}
+
 \section{Changes in version 0.7.15 (2016-12-06}{
   \itemize{
     \item add \code{covfn} argument to \code{read_params}, warn if
