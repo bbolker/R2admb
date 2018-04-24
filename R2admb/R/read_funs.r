@@ -284,7 +284,7 @@ read_rep <- function(fn,names=NULL,warn_nonstd_rep=TRUE) {
     ## check format!
     rr <- readLines(fnx)
     ## FIXME: could test for numerics more carefully ...
-    numLines <- grepl("^[0-9. e]",rr)
+    numLines <- grepl("^[0-9. e+-]$",rr)
     commentLines <- grepl("^#",rr)
     stringLines <- grepl("^[[:alpha:]]*$",rr)
     if (!all(numLines | commentLines | stringLines) || !commentLines[1]) {
