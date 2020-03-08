@@ -153,14 +153,14 @@ predfr <-
 g1  <- ggplot(ReedfrogSizepred,
               aes(x=TBL,y=Kill/10))+
     geom_point()+stat_sum(aes(size=..n..))+
-    geom_smooth(method="loess")+
+    geom_smooth(method="loess",formula=y~x)+
     labs(size="n",x="Size (total body length",
          y="Proportion killed")+
     coord_cartesian(ylim=c(-0.05,0.55))
 startest <- stat_function(fun = function(x) { 0.45*((x/13)*exp(1-x/13)) },
                           lty=2,colour="red")
-g1+startest+
-    geom_line(data=predfr,colour="purple",lty=2)
+print(g1+startest+
+      geom_line(data=predfr,colour="purple",lty=2))
 @ 
 \end{center}
 \caption{Proportions of reed frogs killed by predators,

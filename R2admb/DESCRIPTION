@@ -1,6 +1,6 @@
 Package: R2admb
 Title: 'ADMB' to R Interface Functions
-Version: 0.7.16
+Version: 0.7.16.1
 Authors@R: c(person("Ben Bolker",role=c("aut","cre"),
          email="bolker@mcmaster.ca"),
 	 person("Hans","Skaug",role="aut"),
