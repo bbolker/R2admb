@@ -214,7 +214,7 @@ do_admb <- function(fn,
             } else {
                 ## insert immediately before PROCEDURE
                 tpldat$secs <- append(tpldat$secs,list(PARAMETER=c(dmsg,"")),
-                                      after=which(names(tpldat$secs)=="PROCEDURE")-1)
+                                      after=which.min(names(tpldat$secs) %in% c("PRELIMINARY","PROCEDURE"))-1)
             }
             ## modifications to PROCEDURE section:
             ## need to assign MCMC reporting variables
