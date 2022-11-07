@@ -1,6 +1,6 @@
 Package: R2admb
 Title: 'ADMB' to R Interface Functions
-Version: 0.7.16.1
+Version: 0.7.16.3
 Authors@R: c(person("Ben Bolker",role=c("aut","cre"),
          email="bolker@mcmaster.ca"),
 	 person("Hans","Skaug",role="aut"),
@@ -17,7 +17,7 @@ Imports:
 Suggests:
     bbmle,
     lme4,
-    ggplot2 (>= 2.2.0),
+    ggplot2 (>= 3.4.0),
     testthat,
     knitr
 SystemRequirements: AD Model Builder <http://admb-project.org>
