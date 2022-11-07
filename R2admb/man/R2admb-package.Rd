@@ -16,7 +16,7 @@ standard accessors (i.e. coef(), vcov(), etc.)
 More here!
 }
 \references{
-\url{admb-project.org}
+\url{http://www.admb-project.org}
 }
 \seealso{
 PBSadmb package, glmmADMB package, ADMB2R

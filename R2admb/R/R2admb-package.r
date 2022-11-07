@@ -13,9 +13,8 @@
 #'@docType package
 #'@author Ben Bolker
 #'
-#'Maintainer: Ben Bolker <bolker@@ufl.edu>
 #'@seealso PBSadmb package, glmmADMB package, ADMB2R
-#'@references \url{admb-project.org}
+#'@references \url{http://www.admb-project.org}
 #'@keywords package
 NULL
 
