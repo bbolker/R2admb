@@ -22,6 +22,8 @@ Suggests:
     knitr
 SystemRequirements: AD Model Builder <http://admb-project.org>
 VignetteBuilder: knitr
+URL: https://github.com/bbolker/R2admb
+BugReports: https://github.com/bbolker/R2admb/issues
 License: GPL
 LazyLoad: yes
 Repository: CRAN
